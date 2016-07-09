@@ -1,13 +1,15 @@
 Package: provRmd
-Title: Track Provenance Within Rmd Documents
+Title: Track Provenance Within R Markdown scripts
 Version: 0.0.0.9000
 Authors@R: person("Casey", "O'Hara", email = "casey.c.ohara@gmail.com", role = c("aut", "cre"))
 Description: This package tracks provenance of files read into and written out
-    of a script when the script is executed. Each file is logged with information on
+    of an R Markdown script when the script is executed. Each file is logged with information on
     the most recent git commit (where available), and its role within the script.
+    Additional functions and footers in the package can create a workflow diagram,
+    save the log file, and/or add a footer to the end of the R Markdown document.
 Depends:
     R (>= 3.3.0)
-License: What license is it under?
+License: MIT
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 5.0.1
