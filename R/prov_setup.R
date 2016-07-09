@@ -19,40 +19,40 @@ prov_setup <- function (run_tag = 'standard run') {
   ### If not being knitted (e.g. run chunk at a time) the knitr::: call returns
   ### character(0) so set to a valid temp string.
 
-  prov_script_dir <- file.path(getwd(), knitr:::.knitEnv$input.dir) %>%
+  .prov_script_dir <- file.path(getwd(), knitr:::.knitEnv$input.dir) %>%
     str_sub(1, -3) %>%                            ### ditch annoying '/.' at the end
     str_replace(path.expand('~'), '~')            ### ditch specific home for generic home
 
-  if(length(prov_script_dir) == 0) {
-    prov_script_dir  <- getwd()  ### default for non-knitted operations
+  if(length(.prov_script_dir) == 0) {
+    .prov_script_dir  <- getwd()  ### default for non-knitted operations
   }
-  assign('prov_script_dir', prov_script_dir, envir = .GlobalEnv)
+  assign('.prov_script_dir', .prov_script_dir, envir = .GlobalEnv)
 
-  prov_parent_script_file <- file.path(prov_script_dir, knitr:::knit_concord$get("infile"))
-  if(length(prov_parent_script_file) == 0) {
-    prov_parent_script_file  <- 'Rmd_not_knitted'
+  .prov_parent_script_file <- file.path(.prov_script_dir, knitr:::knit_concord$get("infile"))
+  if(length(.prov_parent_script_file) == 0) {
+    .prov_parent_script_file  <- 'Rmd_not_knitted'
   }
-  assign('prov_parent_script_file', prov_parent_script_file, envir = .GlobalEnv)
+  assign('.prov_parent_script_file', .prov_parent_script_file, envir = .GlobalEnv)
 
   ### set the prov_parent_id variable to the parent script; this will be
   ### temporarily modified during a 'source' call so files operated on
   ### by sourced script will get a new parent.
-  assign('prov_parent_id', prov_parent_script_file, envir = .GlobalEnv)
+  assign('.prov_parent_id', .prov_parent_script_file, envir = .GlobalEnv)
 
   ### set directory for provenance log .csv (for script_prov()):
-  assign('prov_log_dir', file.path(prov_script_dir, 'prov'), envir = .GlobalEnv)
+  assign('.prov_log_dir', file.path(.prov_script_dir, 'prov'), envir = .GlobalEnv)
 
   ### initialize the prov_track global variable
-  assign('prov_track', NULL, envir = .GlobalEnv)
+  assign('.prov_track', NULL, envir = .GlobalEnv)
 
   ### initialize the script_track global variable
-  assign('script_track', NULL, envir = .GlobalEnv)
+  assign('.script_track', NULL, envir = .GlobalEnv)
 
   ### initialize prov_run_tag global variable based on input argument
-  assign('prov_run_tag', run_tag, envir = .GlobalEnv)
+  assign('.prov_run_tag', run_tag, envir = .GlobalEnv)
 
   ### initialize process timing
-  assign('prov_start_time', proc.time(), envir = .GlobalEnv)
+  assign('.prov_start_time', proc.time(), envir = .GlobalEnv)
 
   options(stringsAsFactors = FALSE) ### because factors are annoying
 }

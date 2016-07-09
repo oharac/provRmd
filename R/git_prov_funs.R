@@ -16,19 +16,19 @@
 #' @rdname git_prov_funs
 #' @export
 source <- function(source_fn, ..., nogit = FALSE) {
-  ### prov_parent_id will change within this script to point to the sourced file.
+  ### .prov_parent_id will change within this script to point to the sourced file.
   ### didn't seem to work with local change - so setting it globally
 
-  ### save the current prov_parent_id value temporarily.
-  prov_parent_id_temp <- prov_parent_id
+  ### save the current .prov_parent_id value temporarily.
+  .prov_parent_id_temp <- .prov_parent_id
 
-  ### reset the prov_parent_id value to the sourced file
-  prov_parent_id <<- source_fn
+  ### reset the .prov_parent_id value to the sourced file
+  assign('.prov_parent_id', source_fn, envir = .GlobalEnv)
 
   base::source(file = source_fn, ...)
 
-  ### reset prov_parent_id back to original value
-  prov_parent_id <<- prov_parent_id_temp
+  ### reset .prov_parent_id back to original value
+  assign('.prov_parent_id', .prov_parent_id_temp, envir = .GlobalEnv)
   if(!nogit) git_prov(source_fn, filetype = 'sourced_script')
 }
 

@@ -59,7 +59,10 @@ git_prov <- function(git_file,
   # git_file <- git_file %>%
   #   str_replace(dir_M, 'Mazu:') # %>%
 
-  git_df <- data.frame('parent_fn'     = prov_parent_id,
+  chunk_name <- knitr::opts_current$get("label")
+
+  git_df <- data.frame('parent_fn'     = .prov_parent_id,
+                       'parent_chunk'  = str_replace_all(chunk_name,' ', '_'),
                        'file_loc'      = git_file,
                        'filetype'      = tolower(filetype),
                        'commit_url'    = git_commit_url,
@@ -67,10 +70,10 @@ git_prov <- function(git_file,
                        'commit_date'   = sub('Date: ', '', git_info[3]),
                        'uncommitted_changes' = as.logical(git_uncommitted))
 
-  ### Binds git_df to the global prov_track variable, and reassigns it to the higher environment.
+  ### Binds git_df to the global .prov_track variable, and reassigns it to the higher environment.
   ### nolog argument to git_prov allows to check git info without logging it (for peek_csv() below)
   if(!nolog) {
-    assign('prov_track', prov_track %>% rbind(git_df), envir = .GlobalEnv)
+    assign('.prov_track', .prov_track %>% rbind(git_df), envir = .GlobalEnv)
   }
 
   return(invisible(git_df))

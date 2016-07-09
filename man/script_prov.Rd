@@ -4,7 +4,7 @@
 \alias{script_prov}
 \title{Assemble script provenance information}
 \usage{
-script_prov(script_file, tag = prov_run_tag, commit_outputs = TRUE)
+script_prov(script_file, tag = .prov_run_tag, commit_outputs = TRUE)
 }
 \arguments{
 \item{script_file}{This should be the name of the parent script.}

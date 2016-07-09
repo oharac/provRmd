@@ -37,9 +37,9 @@ plot_prov <- function(df, plot_dir = c('TB', 'LR')[1]) {
     fillcolor = c( hsv(.6, .3, .9), hsv(.3, .4, .9), hsv(.1, .4, .9), hsv(.15, .2, 1)))
     # fontcolor, fontname
   nodes_df <- df %>%
-    dplyr::select(file_loc, filetype, commit_url, uncommitted_changes) %>%
-    mutate(nodes   = file_loc,
-           label   = basename(file_loc),
+    dplyr::select(file_loc, parent_chunk, filetype, commit_url, uncommitted_changes) %>%
+    mutate(nodes   = ifelse(is.na(parent_chunk), file_loc, paste0(file_loc, '_', parent_chunk)),
+           label   = ifelse(is.na(parent_chunk), basename(file_loc), paste0(basename(file_loc), '_', parent_chunk)),
            tooltip = commit_url,
            style   = 'filled',
            fontsize  = 6,
@@ -50,6 +50,8 @@ plot_prov <- function(df, plot_dir = c('TB', 'LR')[1]) {
     # sides, distortion for different shapes!
     # style to differentiate script vs sourced? or alpha to differentiate source ins/outs?
     unique()
+
+  print(nodes_df)
 
   ### special cases: no git tracking, or uncommitted changes
   nodes_df <- nodes_df %>%
