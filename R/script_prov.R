@@ -28,11 +28,14 @@ script_prov <- function(script_file, tag = .prov_run_tag, commit_outputs = TRUE)
   msg_att_pkgs <- sprintf('Other attached packages: %s', paste(sapply(ses$otherPkgs,
                                                                       function(x) paste(x$Package, x$Version, sep = '_')),
                                                                collapse = ', '))
-  ### Gather git info using system calls.  Convert commit # and remote origin url into a url for that commit.
+
+  ### Gather git info using system calls -----
+  ###   Convert commit # and remote origin url into a url for that commit.
   msg_git  <- git_prov(script_file, filetype = 'parent_script')
   run_time <- (proc.time() - .prov_start_time)[3]
   run_mem  <- NA
 
+  ### set up base info for .script_track -----
   backwards_predicates <- c('output', 'sourced_script') ### for those annoying prov predicates that flip the subject/object
   assign('.script_track', .prov_track %>%
            mutate(elapsed_time  = run_time,
@@ -45,18 +48,43 @@ script_prov <- function(script_file, tag = .prov_run_tag, commit_outputs = TRUE)
                   rdf_object    = ifelse(filetype %in% backwards_predicates, file_loc, parent_fn)),
          envir = .GlobalEnv)
 
+  ### update rdf_subject/object for chunk names (only if subj or obj is parent file) -----
+  assign('.script_track', .script_track %>%
+           mutate(rdf_subject = ifelse(rdf_subject == .prov_parent_script_file & filetype != 'parent_script',
+                                       paste0(rdf_subject, '#', parent_chunk),
+                                       rdf_subject),
+                  rdf_object  = ifelse(rdf_object == .prov_parent_script_file & filetype != 'parent_script',
+                                       paste0(rdf_object, '#', parent_chunk),
+                                       rdf_object)),
+         envir = .GlobalEnv)
+
+  parent_chunk_df <- .script_track %>%
+    select(-parent_chunk) %>%
+    inner_join(data.frame('filetype' = 'parent_script',
+                          'parent_chunk' = c(unique(.script_track$parent_chunk))),
+               by = 'filetype') %>%
+    mutate(file_loc    = paste0(file_loc, '#', parent_chunk),
+           rdf_subject = parent_fn,
+           rdf_object  = file_loc,
+           filetype    = 'parent_chunk')
+
+  assign('.script_track', .script_track %>%
+           bind_rows(parent_chunk_df),
+         envir = .GlobalEnv)
+
+  ### set up predicates based on filetype -----
   assign('.script_track', .script_track %>%
            mutate(rdf_predicate = 'UNDEFINED', ### initialize value to default
-           rdf_predicate = ifelse(str_detect(filetype, 'out'),
+                  rdf_predicate = ifelse(str_detect(filetype, 'out'),
                                   'prov:wasGeneratedBy',
                                   rdf_predicate),
-           rdf_predicate = ifelse(str_detect(filetype, 'in'),
+                  rdf_predicate = ifelse(str_detect(filetype, 'in'),
                                   'prov:used',
                                   rdf_predicate),
-           rdf_predicate = ifelse(str_detect(filetype, 'source'),
+                  rdf_predicate = ifelse(str_detect(filetype, 'source') | str_detect(filetype, 'chunk'),
                                   'prov:wasExecutedBy',
                                   rdf_predicate),
-           rdf_predicate = ifelse(path.expand(rdf_subject) == path.expand(rdf_object),
+                  rdf_predicate = ifelse(path.expand(rdf_subject) == path.expand(rdf_object),
                                   ifelse(uncommitted_changes,
                                          'prov:wasDerivedFrom',
                                          'prov:(isPrettyMuchIdenticalTo)'),

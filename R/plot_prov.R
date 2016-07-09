@@ -16,7 +16,7 @@ plot_prov <- function(df, plot_dir = c('TB', 'LR')[1]) {
 
   # devtools::install_github("rich-iannone/DiagrammeR")
   # devtools::install_github("rich-iannone/DiagrammeRsvg")
-  message('For now, gotta use the install_github version of DiagrammeR and DiagrammeRsvg')
+  message('For now, use the install_github version of DiagrammeR and DiagrammeRsvg')
   library(DiagrammeR, quietly = TRUE)
   library(DiagrammeRsvg, quietly = TRUE)
 
@@ -31,15 +31,17 @@ plot_prov <- function(df, plot_dir = c('TB', 'LR')[1]) {
   ### should have direction set to reverse?
 
   shapes_df <- data.frame(
-    filetype  = c('input',         'output',        'parent_script', 'sourced_script'),
-    shape     = c('oval',          'oval',          'rectangle',     'rectangle'),
-    color     = c( hsv(.6, .5, .7), hsv(.3, .5, .7), hsv(.1, .5, .7), hsv(.1, .5, .7)),
-    fillcolor = c( hsv(.6, .3, .9), hsv(.3, .4, .9), hsv(.1, .4, .9), hsv(.15, .2, 1)))
+    filetype  = c('input',         'output',        'parent_script', 'parent_chunk',   'sourced_script'),
+    shape     = c('oval',          'oval',          'rectangle',     'rectangle',      'rectangle'),
+    color     = c( hsv(.6, .5, .7), hsv(.3, .5, .7), hsv(.1, .5, .7), hsv(.1, .5, .7), hsv(.1, .5, .7)),
+    fillcolor = c( hsv(.6, .3, .9), hsv(.3, .4, .9), hsv(.1, .4, .9), hsv(.1, .4, .9), hsv(.15, .2, 1)))
     # fontcolor, fontname
+
+  ### setting up nodes df -----
   nodes_df <- df %>%
     dplyr::select(file_loc, parent_chunk, filetype, commit_url, uncommitted_changes) %>%
-    mutate(nodes   = ifelse(is.na(parent_chunk), file_loc, paste0(file_loc, '_', parent_chunk)),
-           label   = ifelse(is.na(parent_chunk), basename(file_loc), paste0(basename(file_loc), '_', parent_chunk)),
+    mutate(nodes   = file_loc,
+           label   = basename(file_loc),
            tooltip = commit_url,
            style   = 'filled',
            fontsize  = 6,
@@ -51,7 +53,7 @@ plot_prov <- function(df, plot_dir = c('TB', 'LR')[1]) {
     # style to differentiate script vs sourced? or alpha to differentiate source ins/outs?
     unique()
 
-  print(nodes_df)
+  # print(nodes_df)
 
   ### special cases: no git tracking, or uncommitted changes
   nodes_df <- nodes_df %>%
@@ -60,6 +62,7 @@ plot_prov <- function(df, plot_dir = c('TB', 'LR')[1]) {
            color    = ifelse(str_detect(commit_url, 'no version control'), 'red', color),
            penwidth = ifelse(str_detect(commit_url, 'no version control'), 3,     penwidth))
 
+  ### setting up arrows_df and edges_df -----
   arrows_df <- data.frame(
     rel   = c('prov:used', 'prov:wasGeneratedBy', 'prov:wasExecutedBy'),
     color = c( hsv(.6, .5, .4),    hsv(.3, .5, .4),       hsv(.1, .5, .4)))
@@ -80,6 +83,7 @@ plot_prov <- function(df, plot_dir = c('TB', 'LR')[1]) {
     left_join(arrows_df, by = 'rel') %>%
     unique()
 
+  ### generating graph -----
   prov_gr <- create_graph(nodes_df = nodes_df,
                           edges_df = edges_df,
                           graph_attrs  = sprintf('rankdir = %s', plot_dir),
@@ -90,9 +94,6 @@ plot_prov <- function(df, plot_dir = c('TB', 'LR')[1]) {
                           # graph_time   = NULL,
                           # graph_tz     = NULL,
                           generate_dot = TRUE)
-
-  # render_graph(prov_gr) %>%
-  #   print()
 
   return(invisible(prov_gr))
 

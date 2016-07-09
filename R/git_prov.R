@@ -60,9 +60,13 @@ git_prov <- function(git_file,
   #   str_replace(dir_M, 'Mazu:') # %>%
 
   chunk_name <- knitr::opts_current$get("label")
+  if(length(chunk_name) == 0) chunk_name <- 'not knitted'
+  chunk_name <- str_replace_all(chunk_name, ' ', '_')
+
+  message('chunk name = ', chunk_name)
 
   git_df <- data.frame('parent_fn'     = .prov_parent_id,
-                       'parent_chunk'  = str_replace_all(chunk_name,' ', '_'),
+                       'parent_chunk'  = chunk_name,
                        'file_loc'      = git_file,
                        'filetype'      = tolower(filetype),
                        'commit_url'    = git_commit_url,
