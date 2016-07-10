@@ -17,19 +17,7 @@ script_prov_out_df <- script_prov(.prov_parent_script_file)
 
 ``` {r provenance_plot,  echo = FALSE, message = FALSE, warning = FALSE}
 
-# DT::datatable(.script_track[ , 1:9],
-#               caption = 'Provenance summary for this run:',
-#               rownames = FALSE,
-#               class = 'stripe hover compact',
-#               options  = list(dom = 'tp'))
-
 prov_plot_out <- plot_prov(.script_track)
-
-# plot_prov(.script_track, plot_dir = 'LR')
-# prov_plot_fn <- file.path(.prov_log_dir, sprintf('%s.svg', basename(.prov_parent_script_file)))
-# message('saving flow chart to ', prov_plot_fn)
-# export_graph(prov_plot_out, prov_plot_fn)
-# export_graph(prov_plot_out, file.path(.prov_log_dir, sprintf('%s.png', basename(.prov_parent_script_file))))
 
 render_graph(prov_plot_out)
 

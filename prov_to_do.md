@@ -1,11 +1,8 @@
 ### To do:
-
-* add sequence tracking
-    * how to deal with code chunks in sequence? 
-    * maybe: just set sequence = 0 (or 1) manually in script_prov
 * how to do memory tracking/profiling
 * can the footer be added as a command?  
-    * direct call to knit child
+    * direct call to knit child?  
+    * seems to be issues with plotting graphs and tables... wtf
 
 ### Instructions/documentation
 

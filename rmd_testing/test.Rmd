@@ -90,6 +90,6 @@ these footers do not work:
 
 `prov/prov_ftr1.Rmd` is just the diagram; `prov_ftr2.Rmd` also adds a table
 
-``` {r child = 'prov/prov_ftr1.Rmd'}
+``` {r child = 'prov/prov_ftr2.Rmd'}
 ```
 
