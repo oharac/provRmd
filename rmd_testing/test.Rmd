@@ -76,5 +76,5 @@ The code for the R code chunk header looks like this:
 
 Note that it is executed as if it were just part of this main document; it numbers the section ("Provenance") as a continuation of the numbering, and the variables are evaluated in the environment of the main document.
 
-``` {r child = system.file('footer/prov_ftr1.Rmd', package = 'provRmd')}
+``` {r child = 'prov/prov_ftr1.Rmd'}
 ```
