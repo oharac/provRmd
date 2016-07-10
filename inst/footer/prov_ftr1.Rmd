@@ -34,11 +34,13 @@ prov_plot_out <- plot_prov(.script_track)
 render_graph(prov_plot_out)
 ```
 
-``` {r clean up, eval = FALSE}
+``` {r cleanup,  echo = FALSE, message = FALSE, warning = FALSE}
   ### delete footers from local prov/ directory
   ftr_list <- list.files(system.file('footer', package = 'provRmd'))
-  lapply(ftr_list, function(x) {
-    unlink(file.path('prov', x))
-  })
+  invisible(
+    lapply(ftr_list, function(x) {
+      unlink(file.path('prov', x))
+    })
+  )
 ```
 
