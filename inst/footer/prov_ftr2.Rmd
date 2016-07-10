@@ -80,7 +80,7 @@ DT::datatable(prov_tbl1 %>%
   ftr_list <- list.files(system.file('footer', package = 'provRmd'))
   invisible(
     lapply(ftr_list, function(x) {
-      unlink(file.path('prov', x))
+      unlink(x)
     })
   )
 ```

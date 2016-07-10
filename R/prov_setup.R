@@ -34,7 +34,7 @@ prov_setup <- function (run_tag = 'standard run') {
   }
   assign('.prov_parent_script_file', .prov_parent_script_file, envir = .GlobalEnv)
 
-  ### set the prov_parent_id variable to the parent script; this will be
+  ### set the .prov_parent_id variable to the parent script; this will be
   ### temporarily modified during a 'source' call so files operated on
   ### by sourced script will get a new parent.
   assign('.prov_parent_id', .prov_parent_script_file, envir = .GlobalEnv)
@@ -42,14 +42,18 @@ prov_setup <- function (run_tag = 'standard run') {
   ### set directory for provenance log .csv (for script_prov()):
   assign('.prov_log_dir', file.path(.prov_script_dir, 'prov'), envir = .GlobalEnv)
 
-  ### initialize the prov_track global variable
+  ### initialize the .prov_track global variable
   assign('.prov_track', NULL, envir = .GlobalEnv)
 
-  ### initialize the script_track global variable
+  ### initialize the .script_track global variable
   assign('.script_track', NULL, envir = .GlobalEnv)
 
-  ### initialize prov_run_tag global variable based on input argument
+  ### initialize .prov_run_tag global variable based on input argument
   assign('.prov_run_tag', run_tag, envir = .GlobalEnv)
+
+  ### initialize .prov_sequence global variable - starts at 2 because
+  ### the parent script will be set to 1
+  assign('.prov_sequence', 2, envir = .GlobalEnv)
 
   ### initialize process timing
   assign('.prov_start_time', proc.time(), envir = .GlobalEnv)
@@ -62,7 +66,8 @@ prov_setup <- function (run_tag = 'standard run') {
   invisible(
     lapply(ftr_list, function(x) {
       file.copy(from = system.file(file.path('footer', x), package = 'provRmd'),
-                to   = file.path('prov', x))
+                to   = file.path('prov', x),
+                overwrite = TRUE)
     })
   )
 }

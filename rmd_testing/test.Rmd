@@ -49,7 +49,7 @@ write.csv(table1, table2_file)
 
 ```
 
-``` {r, message = FALSE, echo = FALSE}
+``` {r sourcing a file, message = FALSE, echo = FALSE}
 source(file.path(dir_test, 'test_source.R'))
 
 # tableA      <- read_csv(tableA_file)
@@ -76,5 +76,20 @@ The code for the R code chunk header looks like this:
 
 Note that it is executed as if it were just part of this main document; it numbers the section ("Provenance") as a continuation of the numbering, and the variables are evaluated in the environment of the main document.
 
+these footers do not work: 
+
+```
+`.r knit_child('prov/prov_ftr1.Rmd')`
+
+`.r prov_wrapup()`
+
+.``` {r footer}
+  prov_wrapup()
+.```
+```
+
+`prov/prov_ftr1.Rmd` is just the diagram; `prov_ftr2.Rmd` also adds a table
+
 ``` {r child = 'prov/prov_ftr1.Rmd'}
 ```
+
