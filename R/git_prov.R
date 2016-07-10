@@ -27,6 +27,8 @@ git_prov <- function(git_file,
   ### attempt to read git_info for script or input
   suppressWarnings({
     git_info <- system2('git', args = sprintf('log --follow %s', git_file), stderr = FALSE, stdout = TRUE)[1:3]
+    message('git ', sprintf('log --follow %s', git_file))
+    message('  ', git_info[1], '\n  ', git_info[2], '\n  ', git_info[3])
     #    git_diff <- system2('git', args = 'diff HEAD', stderr = TRUE, stdout = TRUE)
   })
   ### if git_info[1] is NA, commit info not found.

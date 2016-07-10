@@ -31,6 +31,7 @@ script_prov <- function(script_file, tag = .prov_run_tag, commit_outputs = TRUE)
 
   ### Gather git info using system calls -----
   ###   Convert commit # and remote origin url into a url for that commit.
+  message('#########\nGetting provenance info for parent script: ', script_file)
   msg_git  <- git_prov(script_file, filetype = 'parent_script')
   run_time <- (proc.time() - .prov_start_time)[3]
   run_mem  <- NA
