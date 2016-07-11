@@ -13,15 +13,13 @@
 
 prov_setup <- function (run_tag = 'standard run') {
 
-  require('dplyr'); require('tidyr'); require('stringr'); require('readr'); require('knitr')
-
   ### set up current directory and file for knitted script.
   ### If not being knitted (e.g. run chunk at a time) the knitr::: call returns
   ### character(0) so set to a valid temp string.
 
   .prov_script_dir <- file.path(getwd(), knitr:::.knitEnv$input.dir) %>%
-    str_sub(1, -3) %>%                            ### ditch annoying '/.' at the end
-    str_replace(path.expand('~'), '~')            ### ditch specific home for generic home
+    stringr::str_sub(1, -3) %>%                            ### ditch annoying '/.' at the end
+    stringr::str_replace(path.expand('~'), '~')            ### ditch specific home for generic home
 
   if(length(.prov_script_dir) == 0) {
     .prov_script_dir  <- getwd()  ### default for non-knitted operations

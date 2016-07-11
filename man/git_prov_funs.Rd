@@ -45,7 +45,7 @@ stack(x, nogit = FALSE, ...)
 
 writeRaster(x, filename, bylayer = FALSE, nogit = FALSE, ...)
 
-gdal_rasterize(..., nogit = FALSE)
+gdal_rasterize(src_datasource, dst_filename, ..., nogit = FALSE)
 
 rasterize(x, y, filename = "", nogit = FALSE, ...)
 }

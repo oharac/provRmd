@@ -11,7 +11,6 @@
 
 script_prov <- function(script_file, tag = .prov_run_tag, commit_outputs = TRUE) {
   # script_file <- .prov_parent_script_file; tag = .prov_run_tag
-  require('dplyr'); require('tidyr'); require('stringr'); require('readr'); require('knitr')
 
   if(commit_outputs) {
     commit_prov(script_file, tag)
@@ -38,63 +37,63 @@ script_prov <- function(script_file, tag = .prov_run_tag, commit_outputs = TRUE)
   ### set up base info for .script_track -----
   backwards_predicates <- c('output', 'sourced_script') ### for those annoying prov predicates that flip the subject/object
   assign('.script_track', .prov_track %>%
-           mutate(elapsed_time  = run_time,
-                  memory_use    = run_mem,
-                  sys_info      = msg_sys,
-                  ses_info      = msg_ses,
-                  base_pkgs     = msg_base_pkgs,
-                  attached_pkgs = msg_att_pkgs,
-                  rdf_subject   = ifelse(filetype %in% backwards_predicates, parent_fn, file_loc),
-                  rdf_object    = ifelse(filetype %in% backwards_predicates, file_loc, parent_fn)),
+           dplyr::mutate(elapsed_time  = run_time,
+                         memory_use    = run_mem,
+                         sys_info      = msg_sys,
+                         ses_info      = msg_ses,
+                         base_pkgs     = msg_base_pkgs,
+                         attached_pkgs = msg_att_pkgs,
+                         rdf_subject   = ifelse(filetype %in% backwards_predicates, parent_fn, file_loc),
+                         rdf_object    = ifelse(filetype %in% backwards_predicates, file_loc, parent_fn)),
          envir = .GlobalEnv)
 
   ### update rdf_subject/object for chunk names (only if subj or obj is parent file) -----
   assign('.script_track', .script_track %>%
-           mutate(rdf_subject = ifelse(rdf_subject == .prov_parent_script_file & filetype != 'parent_script',
-                                       paste0(rdf_subject, '#', parent_chunk),
-                                       rdf_subject),
-                  rdf_object  = ifelse(rdf_object == .prov_parent_script_file & filetype != 'parent_script',
-                                       paste0(rdf_object, '#', parent_chunk),
-                                       rdf_object)),
+           dplyr::mutate(rdf_subject = ifelse(rdf_subject == .prov_parent_script_file & filetype != 'parent_script',
+                                              paste0(rdf_subject, '#', parent_chunk),
+                                              rdf_subject),
+                         rdf_object  = ifelse(rdf_object == .prov_parent_script_file & filetype != 'parent_script',
+                                              paste0(rdf_object, '#', parent_chunk),
+                                              rdf_object)),
          envir = .GlobalEnv)
 
   parent_chunk_df <- .script_track %>%
     dplyr::select(-parent_chunk) %>%
-    inner_join(data.frame('filetype' = 'parent_script',
-                          'parent_chunk' = c(unique(.script_track$parent_chunk))),
-               by = 'filetype') %>%
-    mutate(file_loc    = paste0(file_loc, '#', parent_chunk),
-           rdf_subject = parent_fn,
-           rdf_object  = file_loc,
-           filetype    = 'parent_chunk')
+    dplyr::inner_join(data.frame('filetype' = 'parent_script',
+                                 'parent_chunk' = c(unique(.script_track$parent_chunk))),
+                      by = 'filetype') %>%
+    dplyr::mutate(file_loc    = paste0(file_loc, '#', parent_chunk),
+                  rdf_subject = parent_fn,
+                  rdf_object  = file_loc,
+                  filetype    = 'parent_chunk')
 
   assign('.script_track', .script_track %>%
-           bind_rows(parent_chunk_df),
+           dplyr::bind_rows(parent_chunk_df),
          envir = .GlobalEnv)
 
   ### set up predicates based on filetype -----
   assign('.script_track', .script_track %>%
-           mutate(rdf_predicate = 'UNDEFINED', ### initialize value to default
-                  rdf_predicate = ifelse(str_detect(filetype, 'out'),
-                                  'prov:wasGeneratedBy',
-                                  rdf_predicate),
-                  rdf_predicate = ifelse(str_detect(filetype, 'in'),
-                                  'prov:used',
-                                  rdf_predicate),
-                  rdf_predicate = ifelse(str_detect(filetype, 'source') | str_detect(filetype, 'chunk'),
-                                  'prov:wasExecutedBy',
-                                  rdf_predicate),
-                  rdf_predicate = ifelse(path.expand(rdf_subject) == path.expand(rdf_object),
-                                  ifelse(uncommitted_changes,
-                                         'prov:wasDerivedFrom',
-                                         'prov:(isPrettyMuchIdenticalTo)'),
-                                  rdf_predicate)),
+           dplyr::mutate(rdf_predicate = 'UNDEFINED', ### initialize value to default
+                         rdf_predicate = ifelse(stringr::str_detect(filetype, 'out'),
+                                                'prov:wasGeneratedBy',
+                                                rdf_predicate),
+                         rdf_predicate = ifelse(stringr::str_detect(filetype, 'in'),
+                                                'prov:used',
+                                                rdf_predicate),
+                         rdf_predicate = ifelse(stringr::str_detect(filetype, 'source') | stringr::str_detect(filetype, 'chunk'),
+                                                'prov:wasExecutedBy',
+                                                rdf_predicate),
+                         rdf_predicate = ifelse(path.expand(rdf_subject) == path.expand(rdf_object),
+                                                ifelse(uncommitted_changes,
+                                                       'prov:wasDerivedFrom',
+                                                       'prov:(isPrettyMuchIdenticalTo)'),
+                                                rdf_predicate)),
          envir = .GlobalEnv)
 
 
   run_hash <- digest::sha1(.script_track)
   assign('.script_track', .script_track %>%
-           mutate(run_hash = run_hash),
+           dplyr::mutate(run_hash = run_hash),
          envir = .GlobalEnv)
 
 
@@ -109,29 +108,29 @@ script_prov <- function(script_file, tag = .prov_run_tag, commit_outputs = TRUE)
       warning(sprintf('No log file found at %s - initializing new log file.\n', .prov_log_file))
         ### no log found, so initialize log with run_id = 1 for all inputs and script.
       assign('.script_track', data.frame('run_id'   = rep(1,      length.out = nrow(.script_track)),
-                                  'run_tag'  = tag,
-                                  'run_date' = rep(date(), length.out = nrow(.script_track)),
-                                  .script_track,
-                                  stringsAsFactors = FALSE),
+                                         'run_tag'  = tag,
+                                         'run_date' = rep(date(), length.out = nrow(.script_track)),
+                                         .script_track,
+                                         stringsAsFactors = FALSE),
              envir = .GlobalEnv)
       run_id <- 1
       log_df <- .script_track
     } else {
-      log_df <- read_csv(.prov_log_file, nogit = TRUE)
+      log_df <- readr::read_csv(.prov_log_file, nogit = TRUE)
       run_id_old <- max(log_df$run_id)
       run_id <- run_id_old + 1
       message(sprintf('Log file found at %s; last run_id = %s. Appending latest run.\n', .prov_log_file, run_id_old))
       assign('.script_track', data.frame('run_id'   = rep(run_id, length.out = nrow(.script_track)),
-                                  'run_tag'  = tag,
-                                  'run_date' = rep(date(), length.out = nrow(.script_track)),
-                                  .script_track,
-                                  stringsAsFactors = FALSE),
+                                         'run_tag'  = tag,
+                                         'run_date' = rep(date(), length.out = nrow(.script_track)),
+                                         .script_track,
+                                         stringsAsFactors = FALSE),
              envir = .GlobalEnv)
       log_df <- log_df %>%
-        bind_rows(.script_track)
+        dplyr::bind_rows(.script_track)
     }
     message(sprintf('Writing updated log file to %s.\n', .prov_log_file))
-    write_csv(log_df, .prov_log_file, nogit = TRUE)
+    readr::write_csv(log_df, .prov_log_file, nogit = TRUE)
   }
 
   ### Return all message strings within a named list for convenient reference.

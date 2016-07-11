@@ -9,6 +9,15 @@ Description: This package tracks provenance of files read into and written out
     save the log file, and/or add a footer to the end of the R Markdown document.
 Depends:
     R (>= 3.3.0)
+Imports:
+    dplyr,
+    tidyr,
+    readr,
+    stringr,
+    DT,
+    knitr,
+    DiagrammeR,
+    DiagrammeRsvg
 License: MIT
 Encoding: UTF-8
 LazyData: true

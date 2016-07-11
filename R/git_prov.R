@@ -14,8 +14,6 @@ git_prov <- function(git_file,
                      filetype = c('input', 'output', 'parent_script', 'sourced_script')[1],
                      nolog = FALSE) {
 
-  require('dplyr'); require('tidyr'); require('stringr'); require('readr'); require('knitr')
-
   ###   * parent (the script that operates on the file)
   ###   * file_loc
   ###   * filetype
@@ -39,12 +37,12 @@ git_prov <- function(git_file,
   } else {
     ### git_info[1] is not NA, so commit info is available.
     ### find whether uncommitted differences in this file.
-    ### in str_detect, '$' makes sure git_file string is at end of line.
+    ### in stringr::str_detect, '$' makes sure git_file string is at end of line.
     suppressWarnings({
       git_diff <- system2('git', args = 'diff HEAD', stderr = TRUE, stdout = TRUE)
     })
-    git_diff_check <- which(str_detect(git_diff, sprintf('%s$', basename(git_file))) &
-                              str_detect(git_diff, 'diff --git'))
+    git_diff_check <- which(stringr::str_detect(git_diff, sprintf('%s$', basename(git_file))) &
+                              stringr::str_detect(git_diff, 'diff --git'))
     git_uncommitted <- length(git_diff_check) > 0
 
     ### convert commit info to a hyperlinked commit info string.
@@ -59,11 +57,11 @@ git_prov <- function(git_file,
   }
 
   # git_file <- git_file %>%
-  #   str_replace(dir_M, 'Mazu:') # %>%
+  #   stringr::str_replace(dir_M, 'Mazu:') # %>%
 
   chunk_name <- knitr::opts_current$get("label")
   if(length(chunk_name) == 0) chunk_name <- 'not knitted'
-  chunk_name <- str_replace_all(chunk_name, ' ', '_')
+  chunk_name <- stringr::str_replace_all(chunk_name, ' ', '_')
 
   message('chunk name = ', chunk_name)
 

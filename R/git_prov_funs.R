@@ -144,9 +144,10 @@ writeRaster <- function(x, filename, bylayer = FALSE, nogit = FALSE, ...) {
 
 #' @rdname git_prov_funs
 #' @export
-gdal_rasterize <- function(..., nogit = FALSE) {
-  message("Don't forget to run git_prov() on the inputs and outputs...")
+gdal_rasterize <- function(src_datasource, dst_filename, ..., nogit = FALSE) {
   gdalUtils::gdal_rasterize(...)
+  if(!nogit) git_prov(src_datasource, filetype = 'input')
+  if(!nogit) git_prov(dst_filename, filetype = 'output')
 }
 
 #' @rdname git_prov_funs
