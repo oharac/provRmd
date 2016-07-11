@@ -19,7 +19,7 @@ script_prov_out_df <- script_prov(.prov_parent_script_file)
 
 prov_plot_out <- plot_prov(.script_track)
 
-render_graph(prov_plot_out)
+DiagrammeR::render_graph(prov_plot_out)
 
 ```
 

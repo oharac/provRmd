@@ -116,7 +116,7 @@ script_prov <- function(script_file, tag = .prov_run_tag, commit_outputs = TRUE)
       run_id <- 1
       log_df <- .script_track
     } else {
-      log_df <- readr::read_csv(.prov_log_file, nogit = TRUE)
+      log_df <- readr::read_csv(.prov_log_file)
       run_id_old <- max(log_df$run_id)
       run_id <- run_id_old + 1
       message(sprintf('Log file found at %s; last run_id = %s. Appending latest run.\n', .prov_log_file, run_id_old))
@@ -130,7 +130,7 @@ script_prov <- function(script_file, tag = .prov_run_tag, commit_outputs = TRUE)
         dplyr::bind_rows(.script_track)
     }
     message(sprintf('Writing updated log file to %s.\n', .prov_log_file))
-    readr::write_csv(log_df, .prov_log_file, nogit = TRUE)
+    readr::write_csv(log_df, .prov_log_file)
   }
 
   ### Return all message strings within a named list for convenient reference.
