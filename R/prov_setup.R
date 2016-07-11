@@ -63,6 +63,9 @@ prov_setup <- function (run_tag = 'standard run') {
 
   ### copy footers to local prov/ directory
   ftr_list <- list.files(system.file('footer', package = 'provRmd'))
+
+  if(!dir.exists('prov')) dir.create('prov')
+
   invisible(
     lapply(ftr_list, function(x) {
       file.copy(from = system.file(file.path('footer', x), package = 'provRmd'),

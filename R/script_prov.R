@@ -59,7 +59,7 @@ script_prov <- function(script_file, tag = .prov_run_tag, commit_outputs = TRUE)
          envir = .GlobalEnv)
 
   parent_chunk_df <- .script_track %>%
-    select(-parent_chunk) %>%
+    dplyr::select(-parent_chunk) %>%
     inner_join(data.frame('filetype' = 'parent_script',
                           'parent_chunk' = c(unique(.script_track$parent_chunk))),
                by = 'filetype') %>%

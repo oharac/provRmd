@@ -5,7 +5,7 @@
 \title{Wrap up provenance tracking}
 \usage{
 prov_wrapup(footer = TRUE, workflow = TRUE, table = c("dt", "kable",
-  "none")[1], cleanup = TRUE, tag = .prov_run_tag, commit_outputs = TRUE)
+  "none")[1], cleanup = FALSE, tag = .prov_run_tag, commit_outputs = TRUE)
 }
 \arguments{
 \item{footer}{Create a footer including session and system info.}
