@@ -13,7 +13,10 @@ commit_prov <- function(script_file, tag) {
   ### from .prov_track, identify all output files with uncommitted changes;
   ### commit them and add new commit info to .prov_track
 
-  require('dplyr'); require('tidyr'); require('stringr'); require('readr'); require('knitr')
+  if(!exists('.noknit') | .noknit == TRUE) {
+    message('commit_prov() only operates within the context of knitting an Rmd.')
+    return() ### if not being knitted, escape immediately
+  }
 
 
   ### Stage all new files in repository

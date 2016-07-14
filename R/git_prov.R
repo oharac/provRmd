@@ -22,6 +22,11 @@ git_prov <- function(git_file,
   ###   * commit_date
   ###   * uncommitted_changes
 
+  if(!exists('.noknit') | .noknit == TRUE) {
+    message('git_prov() only operates within the context of knitting an Rmd.')
+    return(invisible()) ### if not being knitted, escape immediately
+  }
+
   ### attempt to read git_info for script or input
   suppressWarnings({
     git_info <- system2('git', args = sprintf('log --follow %s', git_file), stderr = FALSE, stdout = TRUE)[1:3]
