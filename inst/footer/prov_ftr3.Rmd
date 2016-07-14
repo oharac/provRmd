@@ -17,7 +17,7 @@ script_prov_out_df <- script_prov(.prov_parent_script_file)
 
 ``` {r provenance_plot,  echo = FALSE, message = FALSE, warning = FALSE}
 
-prov_plot_out <- plot_prov(.script_track, plot_dir = 'LR')
+prov_plot_out <- plot_prov(.script_track, plot_dir = 'TD')
 
 DiagrammeR::render_graph(prov_plot_out)
 
