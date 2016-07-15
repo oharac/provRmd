@@ -22,13 +22,10 @@ prov_setup <- function (run_tag = 'standard run') {
     stringr::str_replace(path.expand('~'), '~')            ### ditch specific home for generic home
 
   if(length(.prov_script_dir) == 0) {
-    ### not being knitted; so set a global .noknit variable to escape out of other functions
+    ### not being knitted; so escape without acting
     message('prov_setup() only operates within the context of knitting an Rmd.')
-    assign('.noknit', TRUE, envir = .GlobalEnv)
     return(invisible())
     # .prov_script_dir  <- getwd()  ### default for non-knitted operations
-  } else {
-    assign('.noknit', FALSE, envir = .GlobalEnv)
   }
 
   assign('.prov_script_dir', .prov_script_dir, envir = .GlobalEnv)

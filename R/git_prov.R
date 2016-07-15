@@ -12,6 +12,7 @@
 
 git_prov <- function(git_file,
                      filetype = c('input', 'output', 'parent_script', 'sourced_script')[1],
+                     nogit = FALSE,
                      nolog = FALSE) {
 
   ###   * parent (the script that operates on the file)
@@ -22,9 +23,13 @@ git_prov <- function(git_file,
   ###   * commit_date
   ###   * uncommitted_changes
 
-  if(!exists('.noknit') | .noknit == TRUE) {
+  if(is.null(knitr:::.knitEnv$input.dir)) {
     message('git_prov() only operates within the context of knitting an Rmd.')
     return(invisible()) ### if not being knitted, escape immediately
+  }
+
+  if(nogit == TRUE) {
+    return(invisible()) ### skip out of git_prov if nogit == TRUE
   }
 
   ### attempt to read git_info for script or input

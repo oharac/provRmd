@@ -18,7 +18,7 @@ plot_prov <- function(df, plot_dir = c('TB', 'LR')[1]) {
   # library(DiagrammeR, quietly = TRUE)
   # library(DiagrammeRsvg, quietly = TRUE)
 
-  if(!exists('.noknit') | .noknit == TRUE) {
+  if(is.null(knitr:::.knitEnv$input.dir)) {
     message('plot_prov() only operates within the context of knitting an Rmd.')
     return(invisible()) ### if not being knitted, escape immediately
   }

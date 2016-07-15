@@ -12,7 +12,7 @@
 script_prov <- function(script_file, tag = .prov_run_tag, commit_outputs = TRUE) {
   # script_file <- .prov_parent_script_file; tag = .prov_run_tag
 
-  if(!exists('.noknit') | .noknit == TRUE) {
+  if(is.null(knitr:::.knitEnv$input.dir)) {
     message('script_prov() only operates within the context of knitting an Rmd.')
     return(invisible()) ### if not being knitted, escape immediately
   }

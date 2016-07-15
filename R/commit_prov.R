@@ -13,7 +13,7 @@ commit_prov <- function(script_file, tag) {
   ### from .prov_track, identify all output files with uncommitted changes;
   ### commit them and add new commit info to .prov_track
 
-  if(!exists('.noknit') | .noknit == TRUE) {
+  if(is.null(knitr:::.knitEnv$input.dir)) {
     message('commit_prov() only operates within the context of knitting an Rmd.')
     return() ### if not being knitted, escape immediately
   }
