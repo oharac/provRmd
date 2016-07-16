@@ -1,33 +1,43 @@
 #' Access git provenance information
 #'
 #' This function takes a filename and reads its git log, strips to its
-#' most recent commit, and returns a dataframe with git provenance information.
-#' If a prov log exists (and `nolog` is FALSE), this information is added to the log.
+#' most recent commit, and returns a dataframe with git provenance
+#' information.
+#' If a prov log exists (and \code{nolog} is FALSE), this information is
+#' added to the log.
 #' @param git_file A valid file name (relative or absolute)
-#' @param filetype The role of this file within this context: 'input', 'output', 'parent_script', or 'sourced_script'.  Defaults to 'input'.
-#' @param nolog Should this git provenance information be omitted from the log file? Defaults to FALSE.
+#' @param filetype The role of this file within this context: 'input',
+#' 'output', 'parent_script', or 'sourced_script'.  Defaults to 'input'.
+#' @param nolog Should this git provenance information be omitted from
+#' the log file? Defaults to FALSE.
+#' @return Returns (invisibly) a data.frame with git commit info
+#' for the given file; data.frame is a single row with the following
+#' columns:
+#' sequence, parent_fn, parent_chunk, file_loc, filetype, commit_url,
+#' commit_author, commit_date, uncommitted_changes
+#'
 #' @export
 #' @examples
-#' git_prov()
+#' git_prov('raw_data.csv', filetype = 'input')
+#' git_prov('raw_data.csv', filetype = 'input', nogit = TRUE)
+#'   ### will skip provenance tracking for this file
+#' git_prov('raw_data.csv', filetype = 'input', nolog = TRUE)
+#'   ### will gather git commit info for this file, but will not add to the
+#'   ### git tracking data frame.  This can be useful if you just want to
+#'   ### peek at the commit info.
 
 git_prov <- function(git_file,
                      filetype = c('input', 'output', 'parent_script', 'sourced_script')[1],
                      nogit = FALSE,
                      nolog = FALSE) {
 
-  ###   * parent (the script that operates on the file)
-  ###   * file_loc
-  ###   * filetype
-  ###   * commit_url
-  ###   * commit_author
-  ###   * commit_date
-  ###   * uncommitted_changes
-
+  ### Make sure we're operating in a knir environment
   if(is.null(knitr:::.knitEnv$input.dir)) {
     message('git_prov() only operates within the context of knitting an Rmd.')
     return(invisible()) ### if not being knitted, escape immediately
   }
 
+  ### skip out if explicitly told to not track git for this file
   if(nogit == TRUE) {
     return(invisible()) ### skip out of git_prov if nogit == TRUE
   }

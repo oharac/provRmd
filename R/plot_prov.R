@@ -3,20 +3,18 @@
 #' This function takes a filename and reads its git log, strips to its
 #' most recent commit, adds a line to prov_trackfor this file, and returns
 #' a dataframe with git provenance information.
-#' @param df A dataframe of a provenance log file (from script_prov())
-#' @param filetype The role of this file within this context: 'input', 'output', 'parent_script', or 'sourced_script'.  Defaults to 'input'.
-#' @param nolog Should this git provenance information be omitted from the log file? Defaults to FALSE.
+#' @param df A dataframe of a provenance log file (i.e. \code{.script_track}
+#' created by call to \code{script_prov()})
+#' @param plot_dir Should the graph plot top-to-bottom ('TB') or
+#' left-to-right ('LR')?  Defaults to 'LR'.
+#' @return Returns a graph object created by the \code{{DiagrammeR}} package.  This
+#' should be passed to a call to \code{DiagrammeR::render_graph()}
 #' @export
 #' @examples
-#' plot_prov()
+#' prov_graph <- plot_prov(.script_prov)
+#' DiagrammeR::render_graph(prov_graph)
 
 plot_prov <- function(df, plot_dir = c('TB', 'LR')[1]) {
-
-  # devtools::install_github("rich-iannone/DiagrammeR")
-  # devtools::install_github("rich-iannone/DiagrammeRsvg")
-  # message('For now, use the install_github version of DiagrammeR and DiagrammeRsvg')
-  # library(DiagrammeR, quietly = TRUE)
-  # library(DiagrammeRsvg, quietly = TRUE)
 
   if(is.null(knitr:::.knitEnv$input.dir)) {
     message('plot_prov() only operates within the context of knitting an Rmd.')
