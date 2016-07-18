@@ -15,7 +15,7 @@ output:
 
 -----
 
-``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
+``` {r setup, echo = TRUE, message = FALSE, warning = FALSE}
 dir_git <- '~/github/provRmd'
 library(dplyr)
 library(readr)
@@ -32,7 +32,7 @@ prov_setup()### initializes prov_track and loads functions
 
 # read a table; capture prov info
 
-``` {r read global species list, echo = FALSE, message = FALSE, warning = FALSE}
+``` {r read global species list, echo = TRUE, message = FALSE, warning = FALSE}
 table1_file <- file.path(dir_test, 'table1.csv')
 table1      <- read.csv(table1_file, stringsAsFactors = FALSE)
 
@@ -42,23 +42,14 @@ write.csv(table1, table2_file)
 table3_file <- file.path(dir_test, 'table3.csv')
 write.csv(table1, table3_file)
 
-table4_file <- file.path(dir_test, 'table4.csv')
-
-table3_file <- file.path('~', 'table3.csv')
-write.csv(table1, table2_file)
-
 ```
 
-``` {r sourcing a file, message = FALSE, echo = FALSE}
+``` {r sourcing a file, message = FALSE, echo = TRUE}
 source(file.path(dir_test, 'test_source.R'))
 
-# tableA      <- read_csv(tableA_file)
-# 
-# write_csv(tableA, tableB_file)
-
 ```
 
-``` {r display table, echo = FALSE}
+``` {r display table, echo = TRUE}
 DT::datatable(table1,   ### does not display system and session info
               caption  = 'this is a sample table:',              
               rownames = FALSE,

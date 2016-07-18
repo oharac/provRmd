@@ -46,7 +46,7 @@ prov_tbl1 <- prov_tbl %>%
                 uncomm_chgs = uncommitted_changes, commit_hash_short)
 
 DT::datatable(prov_tbl1 %>% 
-                arrange(filetype, file_name),
+                arrange(sequence, desc(filetype), file_name),
                 caption = sprintf('Provenance summary for run %s (%s): %s (%s)', 
                                   run_id, run_hash, run_tag, run_date),             
               rownames = FALSE,
