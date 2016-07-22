@@ -56,7 +56,7 @@ prov_setup()
 spp_df <- read_csv('spp_table1.csv')
 
 spp_df <- spp_df %>%
-  mutate(risk = ifelse(status > .15, 'high', 'low'))
+  mutate(risk = ifelse(status > .16, 'high', 'low'))
 
 write_csv(spp_df, 'spp_table2.csv')
 
@@ -100,7 +100,8 @@ Just as `.prov_track` can be accessed directly, we can also view the contents of
 names(.script_track)
 
 knitr::kable(.script_track[, 4:9] %>%
-               arrange(sequence))
+               arrange(sequence) %>%
+               head())
 ```
 
 While `script_prov()` saves the log file for later review, it may also be helpful to include provenance information directly in the knitted output from the R Markdown doc.  Several pre-built footers are included in the package; these footers can be attached as "child" using a simple code chunk.  The footers include the call to `script_prov()` and will include provenance information as text, tables, and/or flow charts at the end of the knitted document.
