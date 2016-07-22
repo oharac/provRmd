@@ -14,7 +14,7 @@
 #' prov_graph <- plot_prov(.script_prov)
 #' DiagrammeR::render_graph(prov_graph)
 
-plot_prov <- function(df, plot_dir = c('TB', 'LR')[1]) {
+plot_prov <- function(df = .script_track, plot_dir = c('TB', 'LR')[1]) {
 
   if(is.null(knitr:::.knitEnv$input.dir)) {
     message('plot_prov() only operates within the context of knitting an Rmd.')
@@ -60,8 +60,8 @@ plot_prov <- function(df, plot_dir = c('TB', 'LR')[1]) {
   nodes_df <- nodes_df %>%
     dplyr::mutate(color    = ifelse(uncommitted_changes == TRUE, 'yellow', color),
                   penwidth = ifelse(uncommitted_changes == TRUE, 3,        penwidth),
-                  color    = ifelse(str_detect(commit_url, 'no version control'), 'red', color),
-                  penwidth = ifelse(str_detect(commit_url, 'no version control'), 3,     penwidth))
+                  color    = ifelse(stringr::str_detect(commit_url, 'no version control'), 'red', color),
+                  penwidth = ifelse(stringr::str_detect(commit_url, 'no version control'), 3,     penwidth))
 
   ### setting up arrows_df and edges_df -----
   arrows_df <- data.frame(
@@ -71,7 +71,7 @@ plot_prov <- function(df, plot_dir = c('TB', 'LR')[1]) {
   edges_df <- df %>%
     dplyr::select(from, to, rel) %>%
     dplyr::filter(from != to) %>%
-    dplyr::mutate(label = str_replace(rel, 'prov:', ''),
+    dplyr::mutate(label = stringr::str_replace(rel, 'prov:', ''),
                   #dir       = 'back',
                   tooltip   = rel,
                   fontsize  = 6,

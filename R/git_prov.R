@@ -46,8 +46,6 @@ git_prov <- function(git_file,
   suppressWarnings({
     git_info <- system2('git', args = sprintf('log --follow %s', git_file), stderr = FALSE, stdout = TRUE)[1:3]
     message('git ', sprintf('log --follow %s', git_file))
-    message('  ', git_info[1], '\n  ', git_info[2], '\n  ', git_info[3])
-    #    git_diff <- system2('git', args = 'diff HEAD', stderr = TRUE, stdout = TRUE)
   })
   ### if git_info[1] is NA, commit info not found.
   if(is.na(git_info[1])) {
@@ -82,8 +80,6 @@ git_prov <- function(git_file,
   chunk_name <- knitr::opts_current$get("label")
   if(length(chunk_name) == 0) chunk_name <- 'not knitted'
   chunk_name <- stringr::str_replace_all(chunk_name, ' ', '_')
-
-  message('chunk name = ', chunk_name)
 
   git_df <- data.frame('sequence'      = ifelse(filetype == 'parent_script', 1, .prov_sequence),
                        'parent_fn'     = .prov_parent_id,

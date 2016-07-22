@@ -25,7 +25,7 @@ commit_prov <- function(script_file, tag) {
            uncommitted_changes = ifelse(is.na(uncommitted_changes), TRUE, uncommitted_changes)),
     envir = .GlobalEnv)
   prov_staged <- .prov_track %>%
-    filter(str_detect(filetype, 'out') & uncommitted_changes == TRUE)
+    filter(stringr::str_detect(filetype, 'out') & uncommitted_changes == TRUE)
   if (nrow(prov_staged) > 0) {
     for (i in 1:nrow(prov_staged)) {
       git_add <- system2('git', args = sprintf('add %s', prov_staged$file_loc[i]), stderr = TRUE, stdout = TRUE)

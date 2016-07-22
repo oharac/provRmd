@@ -9,7 +9,6 @@
 * use document() then install() to set shit up.
 * when pushed to github, should be able to do install_github():
 
-
 ```
   devtools::install_github('oharac/provRmd')
   library(provRmd)

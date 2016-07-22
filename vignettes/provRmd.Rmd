@@ -32,29 +32,95 @@ Note that `provRmd` only works within the context of knitting an R Markdown docu
 
 ## Using `provRmd`
 
-The first step in using `provRmd` is to initialize the global variables that will track the process as the Rmd knits.  The `prov_setup()` function performs this, and should be called early in the R Markdown document, before any important files are read or sourced.
+### Setting up provenance tracking
 
-```
+The first step in using `provRmd` is to initialize the global variables that will track the process as the Rmd knits.  The `prov_setup()` function performs this, and should be called early in the R Markdown document, before any important files are read or sourced.  If you are using packages with read/write capabilities (e.g. `readr`), it is helpful to load `provRmd` afterward so the automatic provenance tracking masks the basic definition.
+
+``` {r setup, echo = TRUE, warning = FALSE, message = FALSE}
+library(dplyr); library(tidyr); library(readr)
+
 library(provRmd)
+
 prov_setup()
 ```
 
-As the knitting process proceeds, each time one of the registered functions is used to read or write data, e.g. `read.csv()` or `writeOGR()`, that function will be performed as normal but then will follow up with an embedded call to `git_prov()`, which uses the file name to query the latest Git commit information.  If no Git information is available (e.g. the file has never been committed, or the file exists outside the current Git repository) then the file will be logged with NAs instead.
+### Capturing provenance of inputs, outputs, and scripts
+
+As the knitting process proceeds, each time one of the registered functions is used to read or write data, e.g. `read.csv()` or `writeOGR()`, that function will be performed as normal but then will follow up with an embedded call to `git_prov()`, which uses the file name to query the latest Git commit information.  If no Git information is available (e.g. the file has never been committed, or the file exists outside the current Git repository) then the file will be logged with NAs instead.  
+
+As the script runs, file provenance info is stored in a hidden global object, `.prov_track`, which can be accessed like any R object.
+
+``` {r git_prov example, echo = TRUE, message = FALSE, warning = FALSE}
+prov_setup()
+
+spp_df <- read_csv('spp_table1.csv')
+
+spp_df <- spp_df %>%
+  mutate(risk = ifelse(status > .15, 'high', 'low'))
+
+write_csv(spp_df, 'spp_table2.csv')
+
+names(.prov_track)
+
+knitr::kable(.prov_track[, 1:5])
+```
 
 Note that `git_prov()` can be called manually, for example when calling a read/write function that is not in the `git_prov_fun` registry.  It may be useful as well to assign a particular file to various roles within the script, e.g. one code chunk creates an object and writes it as an output, and the next code chunk uses it as an input without calling a read function.  In that case, only the write function will be automatically logged.
 
-At the end of the R Markdown document, the `script_prov()` function collects the sequence of information from all calls to `git_prov()`, attaches system information (from `Sys.info()`) and session information (from `sessionInfo()`), and writes out the log file to the prov directory within the working directory of the parent R Markdown document.
+When sourcing external scripts, `git_prov()` will capture provenance for the sourced script, and then associate inputs and outputs to that script, rather than to the parent.
 
-While `script_prov()` saves the log file, it is also helpful to include provenance information directly in the knitted output from the R Markdown doc.  Several pre-built footers are included in the package; these footers can be attached as "child" using a simple code chunk.  The footers include the call to `script_prov()` and will include provenance information as text, tables, and/or flow charts at the end of the knitted document.
+``` {r git_prov source example, echo = TRUE, message = FALSE, warning = FALSE}
+
+source('source_example.R')
+
+knitr::kable(.prov_track[, 1:5])
+```
+
+### Wrapping up provenance tracking
+
+At the end of the R Markdown document, the `script_prov()` function collects the sequence of information from all calls to `git_prov()`, attaches system information (from `Sys.info()`) and session information (from `sessionInfo()`), and writes out the log file to the prov directory within the working directory of the parent R Markdown document.  This information is stored in a dataframe object called `.script_track`.  In addition, `script_prov()` returns (invisibly) a named list object containing information about the session and system. 
+
+``` {r script_prov example, echo = TRUE, message = FALSE, warning = FALSE}
+
+script_out_df <- script_prov() 
+
+names(script_out_df)
+```
+
+The named list items can be called within the R Markdown document to print system/session info.  For example: 
+
+* `script_out_df$msg_sys` prints: 
+    * `r script_out_df$msg_sys`
+* `script_out_df$msg_att_pkgs` prints: 
+    * `r script_out_df$msg_att_pkgs`
+    
+Just as `.prov_track` can be accessed directly, we can also view the contents of `.script_prov`:
+
+``` {r view script_track}
+names(.script_track)
+
+knitr::kable(.script_track[, 4:9] %>%
+               arrange(sequence))
+```
+
+While `script_prov()` saves the log file for later review, it may also be helpful to include provenance information directly in the knitted output from the R Markdown doc.  Several pre-built footers are included in the package; these footers can be attached as "child" using a simple code chunk.  The footers include the call to `script_prov()` and will include provenance information as text, tables, and/or flow charts at the end of the knitted document.
+
+### Creating provenance flow charts
+
+The `plot_prov()` function uses the `.script_track` dataframe to link inputs, outputs, code chunks, and sourced scripts into a conceptual flow chart.  
+
+``` {r plot_prov}
+plot_obj <- plot_prov(df = .script_track, plot_dir = 'TB')
+
+DiagrammeR::render_graph(plot_obj)
+```
+
+Red frames indicate files not currently tracked in Git; yellow frames indicate files whose contents have changed since the most recent Git commit.
 
 ## Good practices
 
 ### Naming code chunks
-To gain the most granularity in the workflow provenance documentation of your R Markdown process, it is helpful to break up R code into small, meaningful chunks; each chunk might take in some inputs and create some outputs.  Since `provRmd` tracks each chunk separately, it is helpful to give it a short but meaningful name; otherwise it will default to `unnamed_chunk_1` and so on.
-
-```
-short example
-```
+To gain the most granularity in the workflow provenance documentation of your R Markdown process, it is helpful to break up R code into small, meaningful chunks; each chunk might take in some inputs and create some outputs.  Since `provRmd` tracks each chunk separately, it is helpful to give each a short but meaningful name; unnamed chunks will default to `unnamed_chunk_1` and so on.
 
 ### Linking objects passed between code chunks
 
