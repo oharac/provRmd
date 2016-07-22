@@ -212,12 +212,8 @@ script_prov()
 DiagrammeR::render_graph(plot_prov(.script_track, plot_dir = 'LR'))
 ```
 
-Even though the `table_y.csv` file already exists and is not created anew, both the `spp_table1.csv` (input) and `table_y.csv` (output) still show up in the provenance tracking dataframe, log, and workflow chart.
+Even though the `table_y.csv` file already exists and is not created anew in this run of the script, both the `spp_table1.csv` (input) and `table_y.csv` (output) still show up in the provenance tracking dataframe, log, and workflow chart.
 
-## script_prov() standalone and in footers
+### Footers
 
-### manual script_prov()
-
-### manual plot_prov()
-
-### creating custom footers
+TBD
