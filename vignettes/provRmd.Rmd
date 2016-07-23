@@ -218,6 +218,16 @@ DiagrammeR::render_graph(plot_prov(.script_track, plot_dir = 'TB'))
 
 Even though the `table_y.csv` file already exists and is not created anew in this run of the script, both the `spp_table1.csv` (input) and `table_y.csv` (output) still show up in the provenance tracking dataframe, log, and workflow chart.
 
-### Footers
+## Footers
 
-TBD
+The `provRmd` package includes several pre-built footers that call `script_prov()` and output provenance information in a few different ways (table, flow chart, text).  These footers are in a 'footer' folder within the `provRmd` package, and can be accessed directly calling `system.file()`.  For example:
+
+``` {r, echo = TRUE}
+list.files(system.file('footer', package = 'provRmd'))
+```
+
+Currently, the `prov_setup()` function copies these footers to a directory named 'prov' within the R Markdown working directory.  This allows them to easily be called at the end of the R Markdown, via a knitr code chunk with the 'child' option: `{r, child = 'prov/prov_ftr.Rmd'}`
+
+### Custom footers
+
+Footers can be customized easily to show different information as desired, as a separate .Rmd or simply within the main Rmd itself.  The basic idea is to call `script_prov()`, and then create desired outputs as a combination of the list object returned from `script_prov()`, the `.script_track` dataframe object, and the `plot_prov()` function (to assemble a workflow diagram).
