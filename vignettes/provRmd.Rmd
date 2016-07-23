@@ -38,6 +38,10 @@ Note that `provRmd` only works within the context of knitting an R Markdown docu
 
 The first step in using `provRmd` is to initialize the global variables that will track the process as the Rmd knits.  The `prov_setup()` function performs this, and should be called early in the R Markdown document, before any important files are read or sourced.  If you are using packages with read/write capabilities (e.g. `readr`), it is helpful to load `provRmd` afterward so the automatic provenance tracking masks the basic definition.
 
+``` {r fig setup, echo = FALSE, warning = FALSE, message = FALSE}
+knitr::opts_chunk$set(fig.width = 7, fig.height = 7)
+```
+
 ``` {r setup, echo = TRUE, warning = FALSE, message = FALSE}
 library(dplyr); library(tidyr); library(readr)
 
@@ -149,10 +153,10 @@ write_csv(z, 'table_z.csv')
 
 ``` {r prov_plot 2, echo = FALSE, message = FALSE, warning = FALSE}
 script_prov()
-DiagrammeR::render_graph(plot_prov(.script_track, plot_dir = 'LR'))
+DiagrammeR::render_graph(plot_prov(.script_track, plot_dir = 'TB'))
 ```
 
-From this diagram, there's no easy way to see the relationship between dataframe `y` and dataframe `z`.
+From this diagram, there's no easy way to see the relationship between output `table_y.csv` and output  `table_z.csv`.
 
 #### Example of registered link:
 
@@ -165,7 +169,7 @@ y <- x %>%
 write_csv(y, 'table_y.csv')
 ```
 
-Chunk 2 (called `reg_link_example2`); `y` is used as an input to create `z`, but this time object `y` is reloaded from disk rather than used from memory.  This seems redundant but can be an advantage, to make sure `y` is always the correct object:
+Chunk 2 (called `reg_link_example2`); `table_y.csv` is used as an input to create `table_z.csv`, but this time object `table_y.csv` is reloaded from disk rather than used from memory.  This seems redundant but can be an advantage, to make sure `table_y.csv` is always the correct object:
 ```{r reg_link_ex2, echo = TRUE, message = FALSE, warning = FALSE}
 y <- read_csv('table_y.csv')
 z <- y %>%
@@ -175,10 +179,10 @@ write_csv(z, 'table_z.csv')
 
 ``` {r prov_plot 3, echo = FALSE, message = FALSE, warning = FALSE}
 script_prov()
-DiagrammeR::render_graph(plot_prov(.script_track, plot_dir = 'LR'))
+DiagrammeR::render_graph(plot_prov(.script_track, plot_dir = 'TB'))
 ```
 
-Now we can clearly see that the chunk that output dataframe `z` used dataframe `y` as an input.
+Now we can clearly see that the chunk that output `table_z.csv` used `table_y.csv` as an input.
 
 The same result can also be accomplished by writing the result object in the first chunk and then simply calling `git_prov('table_y.csv')` (using the file name of the written object), with `filetype = 'input'` (which is the default).  This does not reload the object from disk, but still registers the object as an input to the second chunk.  This can be handy to avoid reloading large files.
 
@@ -209,7 +213,7 @@ write_csv(z, 'table_z.csv')
 
 ``` {r prov_plot 4, echo = FALSE, message = FALSE, warning = FALSE}
 script_prov()
-DiagrammeR::render_graph(plot_prov(.script_track, plot_dir = 'LR'))
+DiagrammeR::render_graph(plot_prov(.script_track, plot_dir = 'TB'))
 ```
 
 Even though the `table_y.csv` file already exists and is not created anew in this run of the script, both the `spp_table1.csv` (input) and `table_y.csv` (output) still show up in the provenance tracking dataframe, log, and workflow chart.

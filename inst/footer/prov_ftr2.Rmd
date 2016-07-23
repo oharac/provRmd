@@ -25,8 +25,8 @@ DiagrammeR::render_graph(prov_plot_out)
 
 ``` {r provenance_table,  echo = FALSE, message = FALSE, warning = FALSE}
 
-prov_tbl <- .script_track %>% #[ , 1:10] %>%
-  mutate(commit_url  = str_replace(commit_url, 'Previous commit: ', ''),
+prov_tbl <- .script_track %>%
+  dplyr::mutate(commit_url  = str_replace(commit_url, 'Previous commit: ', ''),
          commit_url  = ifelse(commit_url == 'no version control info found', NA, commit_url),
          commit_hash = ifelse(is.na(commit_url), NA,
                              sprintf('[%s](%s)', str_sub(commit_url, -40, -34), commit_url)),
@@ -39,34 +39,19 @@ run_tag  <- first(prov_tbl$run_tag)
 run_date <- first(prov_tbl$run_date)
 
 prov_tbl1 <- prov_tbl %>%
-  mutate(file_name = basename(file_loc),
+  dplyr::mutate(file_name = basename(file_loc),
          file_dir  = dirname(file_loc) %>% str_replace(path.expand('~'), '~')) %>%
   dplyr::select(sequence, file_name, parent_chunk,
                 file_dir, filetype, 
                 uncomm_chgs = uncommitted_changes, commit_hash_short)
 
 DT::datatable(prov_tbl1 %>% 
-                arrange(sequence, desc(filetype), file_name),
+                dplyr::arrange(sequence, desc(filetype), file_name),
                 caption = sprintf('Provenance summary for run %s (%s): %s (%s)', 
                                   run_id, run_hash, run_tag, run_date),             
               rownames = FALSE,
               class = 'stripe hover compact',
               options  = list(dom = 'tp'))
-
-### DT::datatable creates interactive tables with inactive links; perhaps cut the commit_hash down?
-### knitr::kable creates active links, but no interactivity.  Which?
-### 
-# prov_tbl2 <- prov_tbl %>%
-#   mutate(file_name = basename(file_loc),
-#          file_dir  = dirname(file_loc) %>% str_replace(path.expand('~'), '~')) %>%
-#   dplyr::select(sequence, file_name, parent_chunk,
-#                 file_dir, filetype, 
-#                 uncomm_chgs = uncommitted_changes, commit_hash)
-# 
-# knitr::kable(prov_tbl2 %>% 
-#                arrange(filetype, file_name),
-#              caption = sprintf('Provenance summary for run %s (%s): %s (%s)', run_id, run_hash, run_tag, run_date),             
-#              row.names = FALSE)
 
 ```
 
