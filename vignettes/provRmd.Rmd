@@ -9,7 +9,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Intro to provenance
+# Intro to provenance
 
 The Ocean Health Index strives toward the ideals of open science: access, transparency, reproducibility, and repeatability.  In our global assessment and regional assessments, we have increasingly been using R Markdown to document our work flow, data preparation, and score calculation, while using GitHub as a version control system as well as a means of making our work freely accessible.
 
@@ -24,7 +24,7 @@ The `provRmd` package captures two types of provenance at once:
 
 ![provenance flow chart example](flowchart.png)
 
-## How does `provRmd` work
+# How does `provRmd` work
 
 Each time an R Markdown document is knit, `provRmd` collects information on each input, output, and script file to tie it to its most recent Git commit.  At the end of the knit, this sequence of filenames with their associated Git commit information are wrapped up with information about the system and session in which the R Markdown doc was knit.  This provenance log is saved to a .csv, and can be displayed directly in the knitted document, e.g. as a flow chart or a data table.
 
@@ -32,9 +32,9 @@ By recreating the conditions of a particular run, it should be reasonably simple
 
 Note that `provRmd` only works within the context of knitting an R Markdown document.  
 
-## Using `provRmd`
+# Using `provRmd`
 
-### Setting up provenance tracking
+## Setting up provenance tracking
 
 The first step in using `provRmd` is to initialize the global variables that will track the process as the Rmd knits.  The `prov_setup()` function performs this, and should be called early in the R Markdown document, before any important files are read or sourced.  If you are using packages with read/write capabilities (e.g. `readr`), it is helpful to load `provRmd` afterward so the automatic provenance tracking masks the basic definition.
 
@@ -50,7 +50,7 @@ library(provRmd)
 prov_setup()
 ```
 
-### Capturing provenance of inputs, outputs, and scripts
+## Capturing provenance of inputs, outputs, and scripts
 
 As the knitting process proceeds, each time one of the registered functions is used to read or write data, e.g. `read.csv()` or `writeOGR()`, that function will be performed as normal but then will follow up with an embedded call to `git_prov()`, which uses the file name to query the latest Git commit information.  If no Git information is available (e.g. the file has never been committed, or the file exists outside the current Git repository) then the file will be logged with NAs instead.  
 
@@ -82,7 +82,7 @@ source('source_example.R')
 knitr::kable(.prov_track[, 1:5])
 ```
 
-### Wrapping up provenance tracking
+## Wrapping up provenance tracking
 
 At the end of the R Markdown document, the `script_prov()` function collects the sequence of information from all calls to `git_prov()`, attaches system information (from `Sys.info()`) and session information (from `sessionInfo()`), and writes out the log file to the prov directory within the working directory of the parent R Markdown document.  This information is stored in a dataframe object called `.script_track`.  In addition, `script_prov()` returns (invisibly) a named list object containing information about the session and system. 
 
@@ -124,16 +124,16 @@ DiagrammeR::render_graph(plot_obj)
 
 Red frames indicate files not currently tracked in Git; yellow frames indicate files whose contents have changed since the most recent Git commit.
 
-## Good practices
+# Good practices
 
-### Naming code chunks
+## Naming code chunks
 To gain the most granularity in the workflow provenance documentation of your R Markdown process, it is helpful to break up R code into small, meaningful chunks; each chunk might take in some inputs and create some outputs.  Since `provRmd` tracks each chunk separately, it is helpful to give each a short but meaningful name; unnamed chunks will default to `unnamed_chunk_1` and so on.
 
-### Linking objects passed between code chunks
+## Linking objects passed between code chunks
 
 While R easily holds objects created in one chunk so they may be used in another chunk, this breaks the link of the flow of the data.  One way around this is to have each chunk write out its result object, for example using `write_csv()`, and then have the next chunk read the object back into memory, for example using `read_csv()`.  While this seems redundant, it makes sure that the object is registered as an output from one chunk and then as an input to the next.  
 
-#### Example of missed link:
+### Example of missed link:
 
 Chunk 1 (called `broken_link_example1`)
 ``` {r broken_link_example1, echo = TRUE, message = FALSE, warning = FALSE}
@@ -158,7 +158,7 @@ DiagrammeR::render_graph(plot_prov(.script_track, plot_dir = 'TB'))
 
 From this diagram, there's no easy way to see the relationship between output `table_y.csv` and output  `table_z.csv`.
 
-#### Example of registered link:
+### Example of registered link:
 
 Chunk 1 (called `reg_link_example1`) is identical to the prior example.
 ``` {r reg_link_ex1, echo = TRUE, message = FALSE, warning = FALSE}
@@ -186,7 +186,7 @@ Now we can clearly see that the chunk that output `table_z.csv` used `table_y.cs
 
 The same result can also be accomplished by writing the result object in the first chunk and then simply calling `git_prov('table_y.csv')` (using the file name of the written object), with `filetype = 'input'` (which is the default).  This does not reload the object from disk, but still registers the object as an input to the second chunk.  This can be handy to avoid reloading large files.
 
-#### Registering outputs of an if-then statement
+### Registering outputs of an if-then statement
 
 Sometimes you'd like to avoid re-running a time-consuming process each time the master Rmd is knitted, for example by including an `if(file.exists(filename))` to see if a large raster file already exists before recreating it.  In such a situation where that file already exists, it may be helpful to include a `git_prov()` call (with `filetype = 'output'`) to register that it would normally be created within that code chunk, even if it was not recreated during that particular run.
 
@@ -218,7 +218,7 @@ DiagrammeR::render_graph(plot_prov(.script_track, plot_dir = 'TB'))
 
 Even though the `table_y.csv` file already exists and is not created anew in this run of the script, both the `spp_table1.csv` (input) and `table_y.csv` (output) still show up in the provenance tracking dataframe, log, and workflow chart.
 
-## Footers
+# Footers
 
 The `provRmd` package includes several pre-built footers that call `script_prov()` and output provenance information in a few different ways (table, flow chart, text).  These footers are in a 'footer' folder within the `provRmd` package, and can be accessed directly calling `system.file()`.  For example:
 
@@ -228,6 +228,6 @@ list.files(system.file('footer', package = 'provRmd'))
 
 Currently, the `prov_setup()` function copies these footers to a directory named 'prov' within the R Markdown working directory.  This allows them to easily be called at the end of the R Markdown, via a knitr code chunk with the 'child' option: `{r, child = 'prov/prov_ftr.Rmd'}`
 
-### Custom footers
+## Custom footers
 
 Footers can be customized easily to show different information as desired, as a separate .Rmd or simply within the main Rmd itself.  The basic idea is to call `script_prov()`, and then create desired outputs as a combination of the list object returned from `script_prov()`, the `.script_track` dataframe object, and the `plot_prov()` function (to assemble a workflow diagram).
