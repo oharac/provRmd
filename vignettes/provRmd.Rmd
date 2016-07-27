@@ -144,7 +144,7 @@ While `script_prov()` saves the log file for later review, it may also be helpfu
 The `plot_prov()` function uses the `.script_track` dataframe to link inputs, outputs, code chunks, and sourced scripts into a conceptual flow chart.  
 
 ``` {r plot_prov, echo = TRUE, message = FALSE, warning = FALSE}
-plot_obj <- plot_prov(df = .script_track, plot_dir = 'TB')
+plot_obj <- plot_prov(plot_dir = 'TB')
 
 DiagrammeR::render_graph(plot_obj)
 ```
@@ -164,7 +164,8 @@ While R easily holds objects created in one chunk so they may be used in another
 
 Chunk 1 (called `broken_link_example1`)
 ``` {r broken_link_example1, echo = TRUE, message = FALSE, warning = FALSE}
-prov_setup() ### to clear prior provenance tracking
+prov_setup() ### to reinitialize provenance tracking
+
 x <- read_csv('iris_table1.csv')
 y <- x %>%
   mutate(new_col = 'words')
@@ -180,8 +181,9 @@ write_csv(z, 'table_z.csv')
 
 ``` {r prov_plot2, echo = FALSE, message = FALSE, warning = FALSE}
 script_prov()
-
-flowchart <- plot_prov(.script_track, plot_dir = 'TB')
+message('here in prov_plot2')
+flowchart <- plot_prov(plot_dir = 'TB')
+message('now after plot_prov here in prov_plot2')
 
 DiagrammeR::render_graph(flowchart)
 ```
@@ -193,6 +195,7 @@ From this diagram, there's no easy way to see the relationship between output `t
 Chunk 1 (called `reg_link_example1`) is identical to the prior example.
 ``` {r reg_link_ex1, echo = TRUE, message = FALSE, warning = FALSE}
 prov_setup() ### to clear prior provenance tracking
+
 x <- read_csv('iris_table1.csv')
 y <- x %>%
   mutate(new_col = 'words')
@@ -209,7 +212,10 @@ write_csv(z, 'table_z.csv')
 
 ``` {r prov_plot 3, echo = FALSE, message = FALSE, warning = FALSE}
 script_prov()
-DiagrammeR::render_graph(plot_prov(.script_track, plot_dir = 'TB'))
+
+flowchart <- plot_prov(plot_dir = 'TB')
+
+DiagrammeR::render_graph(flowchart)
 ```
 
 Now we can clearly see that the chunk that output `table_z.csv` used `table_y.csv` as an input.
@@ -222,6 +228,7 @@ Sometimes you'd like to avoid re-running a time-consuming process each time the 
 
 ``` {r if_link1, echo = TRUE, message = FALSE, warning = FALSE}
 prov_setup() ### to clear prior provenance tracking
+
 if(!file.exists('table_y.csv')) {
   x <- read_csv('iris_table1.csv')
   y <- x %>%
@@ -243,7 +250,10 @@ write_csv(z, 'table_z.csv')
 
 ``` {r prov_plot 4, echo = FALSE, message = FALSE, warning = FALSE}
 script_prov()
-DiagrammeR::render_graph(plot_prov(.script_track, plot_dir = 'TB'))
+
+flowchart <- plot_prov(plot_dir = 'TB')
+
+DiagrammeR::render_graph(flowchart)
 ```
 
 Even though the `table_y.csv` file already exists and is not created anew in this run of the script, both the `iris_table1.csv` (input) and `table_y.csv` (output) still show up in the provenance tracking dataframe, log, and workflow chart.
