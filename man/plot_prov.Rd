@@ -4,14 +4,18 @@
 \alias{plot_prov}
 \title{Access git provenance information}
 \usage{
-plot_prov(df, plot_dir = c("TB", "LR")[1])
+plot_prov(df = .script_track, plot_dir = c("TB", "LR")[1])
 }
 \arguments{
-\item{df}{A dataframe of a provenance log file (from script_prov())}
+\item{df}{A dataframe of a provenance log file (i.e. \code{.script_track}
+created by call to \code{script_prov()})}
 
-\item{filetype}{The role of this file within this context: 'input', 'output', 'parent_script', or 'sourced_script'.  Defaults to 'input'.}
-
-\item{nolog}{Should this git provenance information be omitted from the log file? Defaults to FALSE.}
+\item{plot_dir}{Should the graph plot top-to-bottom ('TB') or
+left-to-right ('LR')?  Defaults to 'LR'.}
+}
+\value{
+Returns a graph object created by the \code{{DiagrammeR}} package.  This
+should be passed to a call to \code{DiagrammeR::render_graph()}
 }
 \description{
 This function takes a filename and reads its git log, strips to its
@@ -19,6 +23,7 @@ most recent commit, adds a line to prov_trackfor this file, and returns
 a dataframe with git provenance information.
 }
 \examples{
-plot_prov()
+prov_graph <- plot_prov(.script_prov)
+DiagrammeR::render_graph(prov_graph)
 }
 

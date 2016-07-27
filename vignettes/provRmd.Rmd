@@ -178,9 +178,12 @@ z <- y %>%
 write_csv(z, 'table_z.csv')
 ```
 
-``` {r prov_plot 2, echo = FALSE, message = FALSE, warning = FALSE}
+``` {r prov_plot2, echo = FALSE, message = FALSE, warning = FALSE}
 script_prov()
-DiagrammeR::render_graph(plot_prov(.script_track, plot_dir = 'TB'))
+
+flowchart <- plot_prov(.script_track, plot_dir = 'TB')
+
+DiagrammeR::render_graph(flowchart)
 ```
 
 From this diagram, there's no easy way to see the relationship between output `table_y.csv` and output  `table_z.csv`.
