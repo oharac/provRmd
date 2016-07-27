@@ -80,7 +80,7 @@ git_prov <- function(git_file,
   if(length(chunk_name) == 0) chunk_name <- 'not knitted'
   chunk_name <- stringr::str_replace_all(chunk_name, ' ', '_')
 
-  git_df <- data.frame('sequence'      = ifelse(filetype == 'parent_script', 1, .prov_sequence),
+  git_df <- data.frame('sequence'      = ifelse(filetype == 'parent_script', 0, .prov_sequence),
                        'parent_fn'     = .prov_parent_id,
                        'parent_chunk'  = chunk_name,
                        'file_loc'      = git_file,

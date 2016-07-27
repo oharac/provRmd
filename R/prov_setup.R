@@ -53,9 +53,9 @@ prov_setup <- function (run_tag = 'standard run') {
   ### initialize .prov_run_tag global variable based on input argument
   assign('.prov_run_tag', run_tag, envir = .GlobalEnv)
 
-  ### initialize .prov_sequence global variable - starts at 2 because
-  ### the parent script will be set to 1
-  assign('.prov_sequence', 2, envir = .GlobalEnv)
+  ### initialize .prov_sequence global variable - starts at 1 and then
+  ### the parent script will be set to 0
+  assign('.prov_sequence', 1, envir = .GlobalEnv)
 
   ### initialize process timing
   assign('.prov_start_time', proc.time(), envir = .GlobalEnv)
