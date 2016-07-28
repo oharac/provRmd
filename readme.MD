@@ -4,7 +4,7 @@ Tracks provenance when knitting an Rmd document
 
 ###To use:
 
-from R console: `devtools::install_github('oharac/provRmd')`
+from R console: `devtools::install_github('oharac/provRmd', build_vignettes = TRUE)`
 
 within first code chunk:
 
