@@ -41,10 +41,10 @@ The `provRmd` package is set up to be very simple to use within an existing R Ma
     * `prov_setup()` to initialize the provenance tracking.
 * Some regular code chunks that do cool stuff with your awesome data.
     * masked read/write functions will collect Git commit info and file info on your read/written data.
-* At the end of the R Markdown:
+* At the end of the R Markdown script:
     * option 1 (basic): `script_prov()` to add a built-in R Markdown provenance footer to attach session and system info, and save a provenance log file.
-    * option 2 (fancy): include a pre-built R Markdown footer to execute option 1, and then turn it into pretty graphs and tables within your rendered R Markdown document.
-    * option 3 (hard core): design your own custom footer using `script_prov()` and `plot_prov()`
+    * option 2 (fancy): use `prov_wrapup()` to include an R Markdown footer; this function includes a call to `script_prov()` and then renders provenance information into an optional summary (system and session info), workflow (diagram showing the basic steps of the analysis), and/or table (tabular file-by-file info on provenance)
+    * option 3 (hard core): design your own custom footer using standalone calls to `script_prov()` and `plot_prov()`
 
 ## Setting up provenance tracking
 
@@ -139,7 +139,7 @@ A glimpse of `.script_track` (a few select columns):
 
 While `script_prov()` saves the log file for later review, it may also be helpful to include provenance information directly in the knitted output from the R Markdown doc.  Several pre-built footers are included in the package; these footers can be attached as "child" using a simple code chunk.  The footers include the call to `script_prov()` and will include provenance information as text, tables, and/or flow charts at the end of the knitted document.
 
-### Creating provenance flow charts
+### Creating provenance workflow charts
 
 The `plot_prov()` function uses the `.script_track` dataframe to link inputs, outputs, code chunks, and sourced scripts into a conceptual flow chart.  
 
@@ -258,15 +258,41 @@ DiagrammeR::render_graph(flowchart)
 
 Even though the `table_y.csv` file already exists and is not created anew in this run of the script, both the `iris_table1.csv` (input) and `table_y.csv` (output) still show up in the provenance tracking dataframe, log, and workflow chart.
 
-# Footers
+# Accessing and displaying provenance
 
-The `provRmd` package includes several pre-built footers that call `script_prov()` and output provenance information in a few different ways (table, flow chart, text).  These footers are in a 'footer' folder within the `provRmd` package, and can be accessed directly calling `system.file()`.  For example:
+While the `script_prov()` function collects all the system and session info and attaches it to the provenance log, it only saves the log, and does nothing to display the results.  The information for the provenance log can be accessed from the named list returned from `script_prov()` or the `.script_track` dataframe; but there is a built-in way to access this info easily.
 
-``` {r, echo = TRUE}
-list.files(system.file('footer', package = 'provRmd'))
+## Using `prov_wrapup()` to create default footers
+The `prov_wrapup()` function includes a call to `script_prov()`, and then provides options to include a brief summary (including just system and session information), a workflow diagram (using `prov_plot()`, a flow chart showing the basic processing steps tracked throughout the script run, as well as the inputs and outputs), and/or a table containing specific information on each tracked file.  Creating a footer based on the example above (__NOTE: to display properly,__ the `prov_wrapup()` function must be called from within a code chunk with the `results = 'asis'` chunk option):
+
+``` {r, echo = FALSE, message = FALSE, warning = FALSE}
+prov_setup() ### to clear prior provenance tracking
+
+if(!file.exists('table_y.csv')) {
+  x <- read_csv('iris_table1.csv')
+  y <- x %>%
+    mutate(new_col = 'words')
+  write_csv(y, 'table_y.csv')
+} else {
+  # cat('File table_y.csv already exists; not recreating it')
+  git_prov('iris_table1.csv', filetype = 'input')
+  git_prov('table_y.csv', filetype = 'output')
+}
 ```
 
-Currently, the `prov_setup()` function copies these footers to a directory named 'prov' within the R Markdown working directory.  This allows them to easily be called at the end of the R Markdown, via a knitr code chunk with the 'child' option: `{r, child = 'prov/prov_ftr.Rmd'}`
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+y <- read_csv('table_y.csv')
+z <- y %>%
+  mutate(new_col2 = 'more words')
+write_csv(z, 'table_z.csv')
+```
+
+``` {r, echo = TRUE, message = FALSE, warning = FALSE, results = 'asis'}
+prov_wrapup(include_summary  = TRUE, 
+            include_workflow = TRUE, 
+            include_table    = TRUE,
+            header_level = '###')
+```
 
 ## Custom footers
 
