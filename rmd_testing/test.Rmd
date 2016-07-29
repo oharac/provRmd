@@ -1,21 +1,22 @@
 ---
 title: "R Markdown test rmd"
-author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
-output: 
+author: '*Compiled on `r date()` by `r Sys.info()["user"]`*'
+output:
   html_document:
-    includes: 
-      in_header: '~/github/ohibc/src/templates/ohibc_hdr1.html'
-    toc: true
-    number_sections: true
-    theme: cerulean
     highlight: haddock
+    includes:
+      in_header: ~/github/ohibc/src/templates/ohibc_hdr1.html
+    number_sections: yes
+    theme: cerulean
+    toc: yes
+  html_notebook: null
   pdf_document:
-    toc: true
+    toc: yes
 ---
 
 -----
 
-``` {r setup, echo = TRUE, message = FALSE, warning = FALSE}
+```{r setup, echo = TRUE, message = FALSE, warning = FALSE}
 dir_git <- '~/github/provRmd'
 library(dplyr)
 library(readr)
@@ -32,7 +33,7 @@ prov_setup()### initializes prov_track and loads functions
 
 # read a table; capture prov info
 
-``` {r read global species list, echo = TRUE, message = FALSE, warning = FALSE}
+```{r read global species list, echo = TRUE, message = FALSE, warning = FALSE}
 table1_file <- file.path(dir_test, 'table1.csv')
 table1      <- read.csv(table1_file, stringsAsFactors = FALSE)
 
@@ -44,12 +45,12 @@ write.csv(table1, table3_file)
 
 ```
 
-``` {r sourcing a file, message = FALSE, echo = TRUE}
+```{r sourcing a file, message = FALSE, echo = TRUE}
 source(file.path(dir_test, 'test_source.R'))
 
 ```
 
-``` {r display table, echo = TRUE}
+```{r display table, echo = TRUE}
 DT::datatable(table1,   ### does not display system and session info
               caption  = 'this is a sample table:',              
               rownames = FALSE,
@@ -67,6 +68,20 @@ The code for the R code chunk header looks like this:
 
 Note that it is executed as if it were just part of this main document; it numbers the section ("Provenance") as a continuation of the numbering, and the variables are evaluated in the environment of the main document.
 
+`r x <- system.file('footer/prov_ftr_dummy.Rmd', package = 'provRmd'); message('dummy footer exists? ', file.exists(x))`
+
+`r knitr::knit_child(x)`
+
+``` {r}
+footer_fun <- function() {
+  y <- system.file('footer/prov_ftr3.Rmd', package = 'provRmd'); message('footer 3 exists? ', file.exists(y))
+  x <- knitr::knit_child(y)
+  return(x)
+}
+```
+
+`r footer_fun()`
+
 these footers do not work: 
 
 ```
@@ -74,13 +89,8 @@ these footers do not work:
 
 `.r prov_wrapup()`
 
-.``` {r footer}
+.```{r footer}
   prov_wrapup()
 .```
-```
-
-`prov/prov_ftr1.Rmd` is just the diagram; `prov_ftr2.Rmd` also adds a table
-
-``` {r child = 'prov/prov_ftr2.Rmd'}
 ```
 
