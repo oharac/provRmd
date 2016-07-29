@@ -3,7 +3,7 @@
 # Provenance
 
 ``` {r provenance_info, echo = FALSE, message = FALSE, warning = FALSE}
-
+print(environment())
 script_prov_out_df <- script_prov(.prov_parent_script_file) 
 ```
 

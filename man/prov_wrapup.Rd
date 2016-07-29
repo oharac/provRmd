@@ -4,19 +4,19 @@
 \alias{prov_wrapup}
 \title{Wrap up provenance tracking}
 \usage{
-prov_wrapup(footer = TRUE, workflow = TRUE, table = c("dt", "kable",
-  "none")[1], cleanup = FALSE, tag = .prov_run_tag, commit_outputs = TRUE)
+prov_wrapup(include_summary = TRUE, include_workflow = TRUE,
+  plot_dir = "TD", include_table = TRUE, commit_outputs = TRUE)
 }
 \arguments{
-\item{footer}{Create a footer including session and system info.}
+\item{include_summary}{Include a summary including session and system info in the rendered Rmd.}
 
-\item{workflow}{Create a flow chart of the workflow as determined by the provenance tracking, and append to the footer (footer must be TRUE)}
+\item{include_workflow}{Create a flow chart of the workflow as determined by
+the provenance tracking, and insert into rendered Rmd.}
 
-\item{table}{Create an output table in the footer; 'dt' creates a DT::datatable() interactive table while 'kable' creates a static table; 'none' creates no table}
+\item{plot_dir}{Direction of workflow plot: \code{'TD'} (default) creates a top-down plot
+while \code{'LR'} creates a left-right plot}
 
-\item{cleanup}{Deletes pre-built footers copied in prov_setup().}
-
-\item{tag}{Argument passed to script_prov(); a run tag to be included in provenance log, e.g. 'standard run' (default)}
+\item{include_table}{Create an output table in the rendered Rmd.}
 
 \item{commit_outputs}{Argument passed to script_prov(); create a commit for any new files created during this run? (default TRUE)}
 }
@@ -25,10 +25,10 @@ This function complets the provenance tracking by capturing the provenance
 info for the parent script, as well as the session and system info.  This
 is saved to the provenance log file.  An optional footer is created (by
 default) including a brief session/system summary, workflow chart, and
-table of inputs/outputs.
+table of inputs/outputs.  If a footer is desired, this function should be
+called inside a code chunk with chunk option: \code{results = 'asis'}
 }
 \examples{
-git_wrapup()
-git_wrapup(footer = FALSE, tag = 'debugging data prep', commit_outputs = FALSE)
+prov_wrapup()
 }
 
