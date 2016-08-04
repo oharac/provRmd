@@ -150,10 +150,11 @@ stack <- function(x, nogit = FALSE, ...) {
 #' @export
 writeRaster <- function(x, filename, bylayer = FALSE, nogit = FALSE, ...) {
   raster::writeRaster(x, filename, ..., bylayer = bylayer)
-  if(bylayer == TRUE & !is.null(knitr:::.knitEnv$input.dir)) {
-    message('please run git_prov() manually on individual output layers')
-  } else {
-    if(!is.null(knitr:::.knitEnv$input.dir))
+  if(bylayer == TRUE & length(x) == 1 & !is.null(knitr:::.knitEnv$input.dir)) {
+    message('Using writeRaster with bylayer = TRUE works best if using a vector of filenames')
+  }
+
+  if(!is.null(knitr:::.knitEnv$input.dir)) {
       git_prov(filename, filetype = 'output', nogit)
   }
 }
@@ -162,10 +163,10 @@ writeRaster <- function(x, filename, bylayer = FALSE, nogit = FALSE, ...) {
 #' @export
 gdal_rasterize <- function(src_datasource, dst_filename, ..., nogit = FALSE) {
   gdalUtils::gdal_rasterize(...)
-    if(!is.null(knitr:::.knitEnv$input.dir))
+    if(!is.null(knitr:::.knitEnv$input.dir)) {
       git_prov(src_datasource, filetype = 'input', nogit)
-    if(!is.null(knitr:::.knitEnv$input.dir))
       git_prov(dst_filename, filetype = 'output', nogit)
+    }
 }
 
 #' @rdname git_prov_funs
