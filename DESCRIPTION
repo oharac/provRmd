@@ -1,6 +1,6 @@
 Package: provRmd
 Title: Track Provenance Within R Markdown scripts
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person("Casey", "O'Hara", email = "casey.c.ohara@gmail.com", role = c("aut", "cre"))
 Description: This package tracks provenance of files read into and written out
     of an R Markdown script when the script is executed. Each file is logged with information on

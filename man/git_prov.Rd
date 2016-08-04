@@ -4,24 +4,17 @@
 \alias{git_prov}
 \title{Access git provenance information}
 \usage{
-git_prov(git_file, filetype = c("input", "output", "parent_script",
+git_prov(filename, filetype = c("input", "output", "parent_script",
   "sourced_script")[1], nogit = FALSE, nolog = FALSE)
 }
 \arguments{
-\item{git_file}{A valid file name (relative or absolute)}
+\item{filename}{A valid file name (relative or absolute) or vector of file names}
 
 \item{filetype}{The role of this file within this context: 'input',
 'output', 'parent_script', or 'sourced_script'.  Defaults to 'input'.}
 
 \item{nolog}{Should this git provenance information be omitted from
 the log file? Defaults to FALSE.}
-}
-\value{
-Returns (invisibly) a data.frame with git commit info
-for the given file; data.frame is a single row with the following
-columns:
-sequence, parent_fn, parent_chunk, file_loc, filetype, commit_url,
-commit_author, commit_date, uncommitted_changes
 }
 \description{
 This function takes a filename and reads its git log, strips to its
