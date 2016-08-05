@@ -70,8 +70,9 @@ git_prov <- function(filename,
                       paste(git_info[1], git_info[2], git_info[3], collapse = '; '), git_uncommitted))
     }
 
-    # git_file <- git_file %>%
-    #   stringr::str_replace(dir_M, 'Mazu:') # %>%
+    git_file <- git_file %>%
+      # stringr::str_replace(dir_M, 'Mazu:') # %>%
+      stringr::str_replace(path.expand('~'), '~')
 
     chunk_name <- knitr::opts_current$get("label")
     if(length(chunk_name) == 0) chunk_name <- 'not knitted'
