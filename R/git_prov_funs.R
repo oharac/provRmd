@@ -138,6 +138,7 @@ brick <- function(x, nogit = FALSE, ...) {
 #' @export
 stack <- function(x, nogit = FALSE, ...) {
   if(is.character(x) & !is.null(knitr:::.knitEnv$input.dir)) {
+    if(length(x) > 1) x <- as.list(x)
     y <- raster::stack(x, ...)
     git_prov(x, filetype = 'input', nogit)
     return(y)
@@ -150,7 +151,7 @@ stack <- function(x, nogit = FALSE, ...) {
 #' @export
 writeRaster <- function(x, filename, bylayer = FALSE, nogit = FALSE, ...) {
   raster::writeRaster(x, filename, ..., bylayer = bylayer)
-  if(bylayer == TRUE & length(x) == 1 & !is.null(knitr:::.knitEnv$input.dir)) {
+  if(raster::nlayers(x) & bylayer == TRUE & length(x) == 1 & !is.null(knitr:::.knitEnv$input.dir)) {
     message('Using writeRaster with bylayer = TRUE works best if using a vector of filenames')
   }
 
