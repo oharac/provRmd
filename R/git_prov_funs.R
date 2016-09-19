@@ -20,7 +20,7 @@ source <- function(source_fn, ..., nogit = FALSE) {
   ### didn't seem to work with local change - so setting it globally
 
   if(is.null(knitr:::.knitEnv$input.dir)) {
-    base::source(file = source_fn, ...)
+    tmp <- base::source(file = source_fn, ...)
   } else {
     ### save the current .prov_parent_id value temporarily.
     .prov_parent_id_temp <- .prov_parent_id
@@ -28,13 +28,14 @@ source <- function(source_fn, ..., nogit = FALSE) {
     ### reset the .prov_parent_id value to the sourced file
     assign('.prov_parent_id', source_fn, envir = .GlobalEnv)
 
-    base::source(file = source_fn, ...)
+    tmp <- base::source(file = source_fn, ...)
 
     ### reset .prov_parent_id back to original value
     assign('.prov_parent_id', .prov_parent_id_temp, envir = .GlobalEnv)
     if(!is.null(knitr:::.knitEnv$input.dir))
       git_prov(source_fn, filetype = 'sourced_script', nogit)
   }
+  return(invisible(tmp))
 }
 
 #' @rdname git_prov_funs
@@ -54,6 +55,7 @@ write.csv <- function(x, file, row.names = FALSE, nogit = FALSE, ...) {
   utils::write.csv(x, file = file, ..., row.names = row.names)
   if(!is.null(knitr:::.knitEnv$input.dir))
     git_prov(file, filetype = 'output', nogit)
+  return(invisible(NULL))
 }
 
 ### functions from readr:
@@ -72,6 +74,7 @@ write_csv <- function(x, path, nogit = FALSE, ...) {
   readr::write_csv(x, path = path, ...)
   if(!is.null(knitr:::.knitEnv$input.dir))
     git_prov(path, filetype = 'output', nogit)
+  return(invisible(x))
 }
 
 ### functions to read/write shapefiles:
@@ -90,6 +93,7 @@ writeOGR <- function(obj, dsn, layer, driver = 'ESRI Shapefile', nogit = FALSE, 
   rgdal::writeOGR(obj, dsn = dsn, layer = layer, ..., driver = driver)
   if(!is.null(knitr:::.knitEnv$input.dir))
     git_prov(sprintf('%s/%s.shp', dsn, layer), filetype = 'output', nogit)
+  return(invisible(obj))
 }
 
 #' @rdname git_prov_funs
@@ -107,6 +111,7 @@ writePolyShape <- function(x, fn, nogit = FALSE, ...) {
   maptools::writePolyShape(x, fn, ...)
   if(!is.null(knitr:::.knitEnv$input.dir))
     git_prov(paste(fn, '.shp', sep = ''), filetype = 'output', nogit)
+  return(invisible(x))
 }
 
 ### functions to read/write rasters:
@@ -118,7 +123,7 @@ raster <- function(x, nogit = FALSE, ...) {
     git_prov(x, filetype = 'input', nogit)
     return(y)
   } else {
-    raster::raster(x, ...)
+    return(raster::raster(x, ...))
   }
 }
 
@@ -130,7 +135,7 @@ brick <- function(x, nogit = FALSE, ...) {
     git_prov(x, filetype = 'input', nogit)
     return(y)
   } else {
-    raster::brick(x, ...)
+    return(raster::brick(x, ...))
   }
 }
 
@@ -142,7 +147,7 @@ stack <- function(x, nogit = FALSE, ...) {
     git_prov(x, filetype = 'input', nogit)
     return(y)
   } else {
-    raster::stack(x, ...)
+    return(raster::stack(x, ...))
   }
 }
 
@@ -157,6 +162,7 @@ writeRaster <- function(x, filename, bylayer = FALSE, nogit = FALSE, ...) {
   if(!is.null(knitr:::.knitEnv$input.dir)) {
       git_prov(filename, filetype = 'output', nogit)
   }
+  return(invisible(x))
 }
 
 #' @rdname git_prov_funs
@@ -167,6 +173,7 @@ gdal_rasterize <- function(src_datasource, dst_filename, ..., nogit = FALSE) {
       git_prov(src_datasource, filetype = 'input', nogit)
       git_prov(dst_filename, filetype = 'output', nogit)
     }
+  return(invisible(NULL))
 }
 
 #' @rdname git_prov_funs
