@@ -39,6 +39,7 @@ git_prov <- function(filename,
 
   for(git_file in filename) {
 
+    message('Checking git provenance for ', git_file, '...')
     ### attempt to read git_info for script or input
     suppressWarnings({
       git_info <- system2('git', args = sprintf('log --follow %s', git_file), stderr = FALSE, stdout = TRUE)[1:3]

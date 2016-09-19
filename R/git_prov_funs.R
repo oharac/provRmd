@@ -137,8 +137,7 @@ brick <- function(x, nogit = FALSE, ...) {
 #' @rdname git_prov_funs
 #' @export
 stack <- function(x, nogit = FALSE, ...) {
-  if(is.character(x) & !is.null(knitr:::.knitEnv$input.dir)) {
-    if(length(x) > 1) x <- as.list(x)
+  if(is.character(x[[1]]) & !is.null(knitr:::.knitEnv$input.dir)) {
     y <- raster::stack(x, ...)
     git_prov(x, filetype = 'input', nogit)
     return(y)
