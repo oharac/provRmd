@@ -59,7 +59,21 @@ prov_wrapup <- function(include_summary  = TRUE,
     cruft <- capture.output({
       svg <- DiagrammeRsvg::export_svg(DiagrammeR::render_graph(prov_dgr_out))
     })
+
     print(htmltools::HTML(svg))
+
+    if(require(htmlwidgets)) {
+      if(!exists('.prov_log_dir')) {
+        warning('No provenance directory assigned - no plot will be saved.\n')
+      } else {
+        if(!dir.exists(.prov_log_dir)) dir.create(.prov_log_dir)
+        .prov_graph_file <- file.path(.prov_log_dir, sprintf('%s_workflow.html', basename(.prov_parent_script_file)))
+        message('Saving workflow provenance plot to ', .prov_graph_file)
+        htmlwidgets::saveWidget(DiagrammeR::render_graph(prov_dgr_out),
+                                file = .prov_graph_file,
+                                selfcontained = TRUE)
+      }
+    }
   }
 
   if(include_table) {

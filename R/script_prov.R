@@ -18,7 +18,8 @@
 
 
 script_prov <- function(script_file = .prov_parent_script_file,
-                        tag = .prov_run_tag, commit_outputs = TRUE) {
+                        tag = .prov_run_tag,
+                        commit_outputs = TRUE) {
 
   if(is.null(knitr:::.knitEnv$input.dir)) {
     message('script_prov() only operates within the context of knitting an Rmd.')
@@ -114,8 +115,11 @@ script_prov <- function(script_file = .prov_parent_script_file,
     warning('No provenance directory assigned - this run will not be logged.\n')
     run_id <- 'NOT LOGGED'
   } else {
-    if(!dir.exists(.prov_log_dir)) dir.create(.prov_log_dir)
+    if(!dir.exists(.prov_log_dir))
+      dir.create(.prov_log_dir)
+
     .prov_log_file <- file.path(.prov_log_dir, sprintf('%s.csv', basename(script_file)))
+
       ### takes full script file (including extension) and adds .csv extension
     if(!file.exists(.prov_log_file)) {
       warning(sprintf('No log file found at %s - initializing new log file.\n', .prov_log_file))

@@ -22,4 +22,4 @@
 ### how to use build ignore?
 ### add @return to function docs
 ### make static footer for .doc or .pdf (test for type of knit env?)
-### finish prov_wrapup so it actually works
+### save workflow chart as .html
