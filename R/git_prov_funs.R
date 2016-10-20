@@ -16,22 +16,22 @@
 #' @rdname git_prov_funs
 #' @export
 source <- function(source_fn, ..., nogit = FALSE) {
-  ### .prov_parent_id will change within this script to point to the sourced file.
+  ### .provEnv$parent_id will change within this script to point to the sourced file.
   ### didn't seem to work with local change - so setting it globally
 
   if(is.null(knitr:::.knitEnv$input.dir)) {
     tmp <- base::source(file = source_fn, ...)
   } else {
-    ### save the current .prov_parent_id value temporarily.
-    .prov_parent_id_temp <- .prov_parent_id
+    ### save the current .provEnv$parent_id value temporarily.
+    .provEnv$parent_id_temp <- .provEnv$parent_id
 
-    ### reset the .prov_parent_id value to the sourced file
-    assign('.prov_parent_id', source_fn, envir = .GlobalEnv)
+    ### reset the .provEnv$parent_id value to the sourced file
+    assign('parent_id', source_fn, envir = .provEnv)
 
     tmp <- base::source(file = source_fn, ...)
 
-    ### reset .prov_parent_id back to original value
-    assign('.prov_parent_id', .prov_parent_id_temp, envir = .GlobalEnv)
+    ### reset .provEnv$parent_id back to original value
+    assign('parent_id', .provEnv$parent_id_temp, envir = .provEnv)
     if(!is.null(knitr:::.knitEnv$input.dir))
       git_prov(source_fn, filetype = 'sourced_script', nogit)
   }

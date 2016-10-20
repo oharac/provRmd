@@ -13,52 +13,56 @@
 
 prov_setup <- function (run_tag = 'standard run') {
 
+  ### create environment for all the running variables
+  message('creating .provEnv environment in the parent environment')
+  assign('.provEnv', new.env(), envir = parent.frame())
+
   ### set up current directory and file for knitted script.
   ### If not being knitted (e.g. run chunk at a time) the knitr::: call returns
   ### character(0) so set to a valid temp string.
 
-  .prov_script_dir <- file.path(getwd(), knitr:::.knitEnv$input.dir) %>%
+  script_dir <- file.path(getwd(), knitr:::.knitEnv$input.dir) %>%
     stringr::str_sub(1, -3) %>%                            ### ditch annoying '/.' at the end
     stringr::str_replace(path.expand('~'), '~')            ### ditch specific home for generic home
 
-  if(length(.prov_script_dir) == 0) {
+  if(length(script_dir) == 0) {
     ### not being knitted; so escape without acting
     message('prov_setup() only operates within the context of knitting an Rmd.')
     return(invisible())
-    # .prov_script_dir  <- getwd()  ### default for non-knitted operations
+    # script_dir  <- getwd()  ### default for non-knitted operations
   }
 
-  assign('.prov_script_dir', .prov_script_dir, envir = .GlobalEnv)
+  assign('script_dir', script_dir, envir = .provEnv)
 
-  .prov_parent_script_file <- file.path(.prov_script_dir, knitr:::knit_concord$get("infile"))
-  if(length(.prov_parent_script_file) == 0) {
-    .prov_parent_script_file  <- 'Rmd_not_knitted'
+  parent_script_file <- file.path(script_dir, knitr:::knit_concord$get("infile"))
+  if(length(parent_script_file) == 0) {
+    parent_script_file  <- 'Rmd_not_knitted'
   }
-  assign('.prov_parent_script_file', .prov_parent_script_file, envir = .GlobalEnv)
+  assign('parent_script_file', parent_script_file, envir = .provEnv)
 
-  ### set the .prov_parent_id variable to the parent script; this will be
+  ### set the parent_id variable to the parent script; this will be
   ### temporarily modified during a 'source' call so files operated on
   ### by sourced script will get a new parent.
-  assign('.prov_parent_id', .prov_parent_script_file, envir = .GlobalEnv)
+  assign('parent_id', parent_script_file, envir = .provEnv)
 
   ### set directory for provenance log .csv (for script_prov()):
-  assign('.prov_log_dir', file.path(.prov_script_dir, 'prov'), envir = .GlobalEnv)
+  assign('log_dir', file.path(script_dir, 'prov'), envir = .provEnv)
 
-  ### initialize the .prov_track global variable
-  assign('.prov_track', NULL, envir = .GlobalEnv)
+  ### initialize the prov_track global variable
+  assign('prov_track', NULL, envir = .provEnv)
 
-  ### initialize the .script_track global variable
-  assign('.script_track', NULL, envir = .GlobalEnv)
+  ### initialize the script_track global variable
+  assign('script_track', NULL, envir = .provEnv)
 
-  ### initialize .prov_run_tag global variable based on input argument
-  assign('.prov_run_tag', run_tag, envir = .GlobalEnv)
+  ### initialize run_tag global variable based on input argument
+  assign('run_tag', run_tag, envir = .provEnv)
 
-  ### initialize .prov_sequence global variable - starts at 1 and then
+  ### initialize sequence global variable - starts at 1 and then
   ### the parent script will be set to 0
-  assign('.prov_sequence', 1, envir = .GlobalEnv)
+  assign('sequence', 1, envir = .provEnv)
 
   ### initialize process timing
-  assign('.prov_start_time', proc.time(), envir = .GlobalEnv)
+  assign('start_time', proc.time(), envir = .provEnv)
 
   options(stringsAsFactors = FALSE) ### because factors are annoying
 }

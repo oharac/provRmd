@@ -29,6 +29,10 @@ dir_test <- file.path(dir_git, 'rmd_testing')
 library(provRmd)
 prov_setup()### initializes prov_track and loads functions
 
+  message('in test.Rmd: the word is ', .provEnv$testing)
+  assign('testing2', 'testing2', envir = .provEnv)
+  message('in test.Rmd: the other word is ', .provEnv$testing2)
+
 ```
 
 # read a table; capture prov info

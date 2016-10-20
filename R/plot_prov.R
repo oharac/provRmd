@@ -3,7 +3,7 @@
 #' This function takes a filename and reads its git log, strips to its
 #' most recent commit, adds a line to prov_trackfor this file, and returns
 #' a dataframe with git provenance information.
-#' @param df A dataframe of a provenance log file (i.e. \code{.script_track}
+#' @param df A dataframe of a provenance log file (i.e. \code{.provEnv$script_track}
 #' created by call to \code{script_prov()})
 #' @param plot_dir Should the graph plot top-to-bottom ('TB') or
 #' left-to-right ('LR')?  Defaults to 'LR'.
@@ -11,10 +11,10 @@
 #' should be passed to a call to \code{DiagrammeR::render_graph()}
 #' @export
 #' @examples
-#' prov_graph <- plot_prov(.script_prov)
+#' prov_graph <- plot_prov(.provEnv$script_prov)
 #' DiagrammeR::render_graph(prov_graph)
 
-plot_prov <- function(df = .script_track, plot_dir = c('TB', 'LR')[1]) {
+plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
 
   if(is.null(knitr:::.knitEnv$input.dir)) {
     message('plot_prov() only operates within the context of knitting an Rmd.')

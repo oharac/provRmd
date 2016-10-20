@@ -10,8 +10,8 @@
 #' commit_prov()
 
 commit_prov <- function(script_file, tag) {
-  ### from .prov_track, identify all output files with uncommitted changes;
-  ### commit them and add new commit info to .prov_track
+  ### from .provEnv$prov_track, identify all output files with uncommitted changes;
+  ### commit them and add new commit info to .provEnv$prov_track
 
   if(is.null(knitr:::.knitEnv$input.dir)) {
     message('commit_prov() only operates within the context of knitting an Rmd.')
@@ -20,28 +20,28 @@ commit_prov <- function(script_file, tag) {
 
 
   ### Stage all new files in repository
-  assign('.prov_track', .prov_track %>%
+  assign('prov_track', .provEnv$prov_track %>%
     mutate(uncommitted_changes = as.logical(uncommitted_changes),
            uncommitted_changes = ifelse(is.na(uncommitted_changes), TRUE, uncommitted_changes)),
-    envir = .GlobalEnv)
-  prov_staged <- .prov_track %>%
+    envir = .provEnv)
+  prov_staged <- .provEnv$prov_track %>%
     filter(stringr::str_detect(filetype, 'out') & uncommitted_changes == TRUE)
   if (nrow(prov_staged) > 0) {
     for (i in 1:nrow(prov_staged)) {
       git_add <- system2('git', args = sprintf('add %s', prov_staged$file_loc[i]), stderr = TRUE, stdout = TRUE)
       prov_staged$git_staged[i] <- (length(git_add) == 0)
     }
-    assign('.prov_track', .prov_track %>%
+    assign('prov_track', .provEnv$prov_track %>%
              left_join(prov_staged %>%
                   dplyr::select(file_loc, git_staged) %>%
                   unique(),
                 by = 'file_loc'),
-           envir = .GlobalEnv)
+           envir = .provEnv)
 
   } else {
-    assign('.prov_track', .prov_track %>%
+    assign('prov_track', .provEnv$prov_track %>%
              mutate(git_staged = NA),
-           envir = .GlobalEnv)
+           envir = .provEnv)
 
   }
 
@@ -57,20 +57,20 @@ commit_prov <- function(script_file, tag) {
     git_info <- system2('git', args = sprintf('show %s', git_id), stderr = FALSE, stdout = TRUE)[1:3]
   })
 
-  assign('.prov_track', .prov_track %>%
+  assign('prov_track', .provEnv$prov_track %>%
            mutate(git_staged    = ifelse(is.na(git_staged), FALSE, git_staged),
            commit_url    = commit_url,
            commit_author = commit_author,
            commit_date   = commit_date),
-         envir = .GlobalEnv)
+         envir = .provEnv)
 
-  assign('.prov_track', .prov_track %>%
+  assign('prov_track', .provEnv$prov_track %>%
                   mutate(commit_url    = ifelse(git_staged == TRUE, sprintf('New commit: %s', git_commit_url), commit_url),
            commit_author = ifelse(git_staged == TRUE, sub('Author: ', '', git_info[2]), commit_author),
            commit_date   = ifelse(git_staged == TRUE, sub('Date: ', '', git_info[3]), commit_date),
            uncommitted_changes = ifelse(git_staged == TRUE, FALSE, uncommitted_changes)) %>%
          dplyr::select(-git_staged),
-         envir = .GlobalEnv)
+         envir = .provEnv)
 
 }
 

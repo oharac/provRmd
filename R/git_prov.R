@@ -79,8 +79,8 @@ git_prov <- function(filename,
     if(length(chunk_name) == 0) chunk_name <- 'not knitted'
     chunk_name <- stringr::str_replace_all(chunk_name, ' ', '_')
 
-    git_df <- data.frame('sequence'      = ifelse(filetype == 'parent_script', 0, .prov_sequence),
-                         'parent_fn'     = .prov_parent_id,
+    git_df <- data.frame('sequence'      = ifelse(filetype == 'parent_script', 0, .provEnv$sequence),
+                         'parent_fn'     = .provEnv$parent_id,
                          'parent_chunk'  = chunk_name,
                          'file_loc'      = git_file,
                          'filetype'      = tolower(filetype),
@@ -90,12 +90,12 @@ git_prov <- function(filename,
                          'uncommitted_changes' = as.logical(git_uncommitted))
 
     ### increment the provenance sequence index
-    assign('.prov_sequence', .prov_sequence + 1, envir = .GlobalEnv)
+    assign('sequence', .provEnv$sequence + 1, envir = .provEnv)
 
-    ### Binds git_df to the global .prov_track variable, and reassigns it to the higher environment.
+    ### Binds git_df to the global .provEnv$prov_track variable, and reassigns it to the higher environment.
     ### nolog argument to git_prov allows to check git info without logging it (for peek_csv() below)
     if(!nolog) {
-      assign('.prov_track', .prov_track %>% rbind(git_df), envir = .GlobalEnv)
+      assign('prov_track', .provEnv$prov_track %>% rbind(git_df), envir = .provEnv)
     }
   }
 

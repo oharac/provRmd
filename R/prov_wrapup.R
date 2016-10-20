@@ -30,7 +30,7 @@ prov_wrapup <- function(include_summary  = TRUE,
                         header_level     = '#') {
 
   suppressMessages(suppressWarnings({
-    script_prov_out_df <- script_prov(.prov_parent_script_file, commit_outputs = commit_outputs)
+    script_prov_out_df <- script_prov(.provEnv$parent_script_file, commit_outputs = commit_outputs)
   }))
 
   if(any(include_summary, include_workflow, include_table) & include_header) {
@@ -54,7 +54,7 @@ prov_wrapup <- function(include_summary  = TRUE,
 
   if(include_workflow) {
     cat('\n')
-    prov_dgr_out <- plot_prov(.script_track, plot_dir = plot_dir)
+    prov_dgr_out <- plot_prov(.provEnv$script_track, plot_dir = plot_dir)
 
     cruft <- capture.output({
       svg <- DiagrammeRsvg::export_svg(DiagrammeR::render_graph(prov_dgr_out))
@@ -63,14 +63,14 @@ prov_wrapup <- function(include_summary  = TRUE,
     print(htmltools::HTML(svg))
 
     if(require(htmlwidgets)) {
-      if(!exists('.prov_log_dir')) {
+      if(!exists('log_dir', envir = .provEnv)) {
         warning('No provenance directory assigned - no plot will be saved.\n')
       } else {
-        if(!dir.exists(.prov_log_dir)) dir.create(.prov_log_dir)
-        .prov_graph_file <- file.path(.prov_log_dir, sprintf('%s_workflow.html', basename(.prov_parent_script_file)))
-        message('Saving workflow provenance plot to ', .prov_graph_file)
+        if(!dir.exists(.provEnv$log_dir)) dir.create(.provEnv$log_dir)
+        .provEnv$graph_file <- file.path(.provEnv$log_dir, sprintf('%s_workflow.html', basename(.provEnv$parent_script_file)))
+        message('Saving workflow provenance plot to ', .provEnv$graph_file)
         htmlwidgets::saveWidget(DiagrammeR::render_graph(prov_dgr_out),
-                                file = .prov_graph_file,
+                                file = .provEnv$graph_file,
                                 selfcontained = TRUE)
       }
     }
@@ -78,7 +78,7 @@ prov_wrapup <- function(include_summary  = TRUE,
 
   if(include_table) {
     cat('\n')
-    prov_tbl <- .script_track %>%
+    prov_tbl <- .provEnv$script_track %>%
       dplyr::mutate(commit_url  = stringr::str_replace(commit_url, 'Previous commit: ', ''),
                     commit_url  = ifelse(commit_url == 'no version control info found', NA, commit_url),
                     commit_hash = ifelse(is.na(commit_url), NA,
