@@ -7,7 +7,8 @@
 #' as set up in \code{prov_setup()}.
 #' @param tag An optional run tag; defaults to the run tag set in prov_setup().
 #' @param commit_outputs Should a git commit be created for the output files?
-#' Defaults to TRUE.
+#' Defaults to FALSE; newly created outputs will show as not git-controlled,
+#' while modified outputs will show as changed since last commit.
 #' @return Returns (invisibly) a named list of characters containing system
 #' and session info for the R Markdown knitting session; list includes the
 #' following items: run_id, run_hash, run_tag, elapsed_time, memory_use,
@@ -19,7 +20,7 @@
 
 script_prov <- function(script_file = .provEnv$parent_script_file,
                         tag = .provEnv$run_tag,
-                        commit_outputs = TRUE) {
+                        commit_outputs = FALSE) {
 
   if(is.null(knitr:::.knitEnv$input.dir)) {
     message('script_prov() only operates within the context of knitting an Rmd.')
@@ -29,6 +30,10 @@ script_prov <- function(script_file = .provEnv$parent_script_file,
   if(commit_outputs) {
     commit_prov(script_file, tag)
   }
+
+  ### disable Rprof collection and process into memory allocation
+  Rprof(NULL)
+  # Rprofmem(NULL)
 
   sys <- Sys.info()
   ses <- sessionInfo()
@@ -46,7 +51,19 @@ script_prov <- function(script_file = .provEnv$parent_script_file,
   msg_git  <- git_prov(script_file, filetype = 'parent_script')
 
   run_time <- (proc.time() - .provEnv$start_time)[3]
-  run_mem  <- NA
+
+  ### gather memory allocations from Rprof log
+  mem_df_tmp <- summaryRprof(filename = file.path(get('log_dir', envir = .provEnv), 'rprof_tmp.out'),
+                         memory = 'both') %>%
+    .$by.total
+
+  mem_df <- data.frame(total_time        = mem_df_tmp$total.time,
+                       proportional_time = mem_df_tmp$total.pct,
+                       total_mem         = mem_df_tmp$mem.total[ , 1]) ### mem.total is a matrix?
+
+  run_mem  <- max(mem_df$total_mem)
+
+  print(plot(total_mem ~ total_time, data = mem_df))
 
   ### set up base info for .provEnv$script_track -----
   backwards_predicates <- c('output', 'sourced_script') ### for those annoying prov predicates that flip the subject/object

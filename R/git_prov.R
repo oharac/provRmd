@@ -1,8 +1,7 @@
 #' Access git provenance information
 #'
 #' This function takes a filename and reads its git log, strips to its
-#' most recent commit, and returns a dataframe with git provenance
-#' information.
+#' most recent commit, and appends it to the provenance tracking dataframe.
 #' If a prov log exists (and \code{nolog} is FALSE), this information is
 #' added to the log.
 #' @param filename A valid file name (relative or absolute) or vector of file names
@@ -99,6 +98,6 @@ git_prov <- function(filename,
     }
   }
 
-  return()
+  return(invisible())
 }
 

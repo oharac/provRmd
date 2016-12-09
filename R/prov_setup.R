@@ -64,6 +64,17 @@ prov_setup <- function (run_tag = 'standard run') {
   ### initialize process timing
   assign('start_time', proc.time(), envir = .provEnv)
 
+  ### initialize memory profiling
+  Rprof(filename = file.path(get('log_dir', envir = .provEnv), 'rprof_tmp.out'),
+        # append = FALSE, ### these are defaults
+        # interval = 0.02,
+        # line.profiling = FALSE,
+        # gc.profiling = FALSE,
+        memory.profiling = TRUE)
+
+  # Rprofmem(filename = file.path(get('log_dir', envir = .provEnv), 'rprofmem_tmp.out'),
+  #          append = FALSE, threshold = 0)
+
   options(stringsAsFactors = FALSE) ### because factors are annoying
 }
 
