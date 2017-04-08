@@ -30,7 +30,7 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
   ### sequence goes down the page.  But predicates are usually
   ### passive voice, so e.g. subject WASGENERATEDBY.  So: edges
   ### should have direction set to reverse?
-  message('... in plot_prov.R, setting up shapes_df')
+  # message('... in plot_prov.R, setting up shapes_df')
 
   shapes_df <- data.frame(
                  filetype  = c('input',         'output',        'parent_script', 'parent_chunk',   'sourced_script'),
@@ -40,16 +40,16 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
     # fontcolor, fontname
 
 
-  message('... in plot_prov.R, setting up nodes_id_df')
+  # message('... in plot_prov.R, setting up nodes_id_df')
 
   nodes_id_df <- df %>%
-    arrange(sequence, file_loc) %>%
-    select(node_name = file_loc) %>%
-    distinct() %>%
-    mutate(node_id = 1:n())
+    dplyr::arrange(sequence, file_loc) %>%
+    dplyr::select(node_name = file_loc) %>%
+    dplyr::distinct() %>%
+    dplyr::mutate(node_id = 1:n())
 
 
-  message('... in plot_prov.R, setting up nodes_df')
+  # message('... in plot_prov.R, setting up nodes_df')
   ### setting up nodes df -----
   nodes_df <- df %>%
     dplyr::select(file_loc, parent_chunk, filetype, commit_url, uncommitted_changes) %>%
@@ -82,7 +82,7 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
                  rel   = c('prov:used', 'prov:wasGeneratedBy', 'prov:wasExecutedBy'),
                  color = c( hsv(.6, .5, .4),    hsv(.3, .5, .4),       hsv(.1, .5, .4)))
 
-  message('... in plot_prov.R, setting up edges_df')
+  # message('... in plot_prov.R, setting up edges_df')
   edges_df <- df %>%
     dplyr::select(from_loc, to_loc, rel) %>%
     dplyr::filter(from_loc != to_loc) %>%
@@ -104,9 +104,9 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
     dplyr::distinct()
 
   ### generating graph -----
-  message('... in plot_prov.R, generating graph ', getwd())
-  write_csv(nodes_df, 'nodes.csv')
-  write_csv(edges_df, 'edges.csv')
+  # message('... in plot_prov.R, generating graph ', getwd())
+  # write_csv(nodes_df, 'nodes.csv')
+  # write_csv(edges_df, 'edges.csv')
 
   prov_gr <- DiagrammeR::create_graph(nodes_df = nodes_df,
                                       edges_df = edges_df
@@ -125,7 +125,7 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
       attr_type = c("graph",  "graph"))
 
 
-  message('... in plot_prov.R, returning plot')
+  # message('... in plot_prov.R, returning plot')
   return(invisible(prov_gr))
 
 }

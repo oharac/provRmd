@@ -41,7 +41,7 @@ prov_wrapup <- function(include_summary  = TRUE,
   }
 
   if(include_summary) {
-    message('... in prov_wrapup.R, generating summary')
+    # message('... in prov_wrapup.R, generating summary')
 
     cat(sprintf('- _Run ID: %s (%s); run tag: "%s"_\n',
                 script_prov_out_df$run_id,
@@ -57,17 +57,17 @@ prov_wrapup <- function(include_summary  = TRUE,
   }
 
   if(include_workflow) {
-    message('... in prov_wrapup.R, generating workflow')
+    # message('... in prov_wrapup.R, generating workflow')
     cat('\n')
     prov_dgr_out <- plot_prov(.provEnv$script_track, plot_dir = plot_dir)
 
-    message('... in prov_wrapup.R, exporting graph to svg')
+    # message('... in prov_wrapup.R, exporting graph to svg')
 
     cruft <- capture.output({
       svg <- DiagrammeRsvg::export_svg(DiagrammeR::render_graph(prov_dgr_out))
     })
 
-    message('... in prov_wrapup.R, printing svg plot')
+    # message('... in prov_wrapup.R, printing svg plot')
 
     print(htmltools::HTML(svg))
 
@@ -75,7 +75,7 @@ prov_wrapup <- function(include_summary  = TRUE,
       if(!exists('log_dir', envir = .provEnv)) {
         warning('No provenance directory assigned - no plot will be saved.\n')
       } else {
-        message('... in prov_wrapup.R, saving plot as html widget')
+        # message('... in prov_wrapup.R, saving plot as html widget')
 
         if(!dir.exists(.provEnv$log_dir)) dir.create(.provEnv$log_dir)
         .provEnv$graph_file <- file.path(.provEnv$log_dir, sprintf('%s_workflow.html', basename(.provEnv$parent_script_file)))
@@ -88,7 +88,7 @@ prov_wrapup <- function(include_summary  = TRUE,
   }
 
   if(include_table) {
-    message('... in prov_wrapup.R, generating table output')
+    # message('... in prov_wrapup.R, generating table output')
 
     cat('\n')
     prov_tbl <- .provEnv$script_track %>%
