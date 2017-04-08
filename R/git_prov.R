@@ -6,7 +6,7 @@
 #' added to the log.
 #' @param filename A valid file name (relative or absolute) or vector of file names
 #' @param filetype The role of this file within this context: 'input',
-#' 'output', 'parent_script', or 'sourced_script'.  Defaults to 'input'.
+#' 'output', 'parent_script', 'sourced_script', or 'plot'.  Defaults to 'input'.
 #' @param nolog Should this git provenance information be omitted from
 #' the log file? Defaults to FALSE.
 #'
@@ -21,7 +21,7 @@
 #'   ### peek at the commit info.
 
 git_prov <- function(filename,
-                     filetype = c('input', 'output', 'parent_script', 'sourced_script')[1],
+                     filetype = c('input', 'output', 'parent_script', 'sourced_script', 'plot')[1],
                      nogit = FALSE,
                      nolog = FALSE) {
 

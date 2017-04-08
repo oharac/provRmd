@@ -18,8 +18,7 @@ output:
 
 ```{r setup, echo = TRUE, message = FALSE, warning = FALSE}
 dir_git <- '~/github/provRmd'
-library(dplyr)
-library(readr)
+library(tidyverse)
 library(stringr)
 
 dir_test <- file.path(dir_git, 'rmd_testing')
@@ -47,6 +46,16 @@ write.csv(table1, table3_file)
 
 ```{r sourcing a file, message = FALSE, echo = TRUE}
 source(file.path(dir_test, 'test_source.R'))
+
+```
+
+``` {r saving a plot}
+table1      <- read.csv(table3_file, stringsAsFactors = FALSE)
+
+ggplot(table1, aes(x = cell_id, y = status, color = n_spp)) + 
+  geom_point()
+
+ggsave(file.path(dir_test, 'plot.jpg'))
 
 ```
 

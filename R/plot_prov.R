@@ -33,10 +33,10 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
   # message('... in plot_prov.R, setting up shapes_df')
 
   shapes_df <- data.frame(
-                 filetype  = c('input',         'output',        'parent_script', 'parent_chunk',   'sourced_script'),
-                 shape     = c('oval',          'oval',          'rectangle',     'rectangle',      'rectangle'),
-                 color     = c( hsv(.6, .5, .7), hsv(.3, .5, .7), hsv(.1, .5, .7), hsv(.1, .5, .7), hsv(.1, .5, .7)),
-                 fillcolor = c( hsv(.6, .3, .9), hsv(.3, .4, .9), hsv(.1, .4, .9), hsv(.1, .4, .9), hsv(.15, .2, 1)))
+                 filetype  = c('input',         'output',        'parent_script', 'parent_chunk',   'sourced_script', 'plot'),
+                 shape     = c('oval',          'oval',          'rectangle',     'rectangle',      'rectangle',      'diamond'),
+                 color     = c( hsv(.6, .5, .7), hsv(.3, .5, .7), hsv(.1, .5, .7), hsv(.1, .5, .7), hsv(.1, .5, .7), hsv(.8, .5, .7)),
+                 fillcolor = c( hsv(.6, .3, .9), hsv(.3, .4, .9), hsv(.1, .4, .9), hsv(.1, .4, .9), hsv(.15, .2, 1), hsv(.8, .3, .9)))
     # fontcolor, fontname
 
 
@@ -64,8 +64,6 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
     dplyr::left_join(nodes_id_df %>%
                        rename(id = node_id), by = 'node_name') %>%
     dplyr::left_join(shapes_df, by = 'filetype') %>%
-    # sides, distortion for different shapes!
-    # style to differentiate script vs sourced? or alpha to differentiate source ins/outs?
     dplyr::distinct()
 
   # print(nodes_df)
@@ -76,6 +74,15 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
                   penwidth = ifelse(uncommitted_changes == TRUE, 3,        penwidth),
                   color    = ifelse(stringr::str_detect(commit_url, 'no version control'), 'red', color),
                   penwidth = ifelse(stringr::str_detect(commit_url, 'no version control'), 3,     penwidth))
+
+  ### if a file is both input and output, select only output (for plot attributes)
+  nodes_df <- nodes_df %>%
+    dplyr::group_by(id) %>%
+    dplyr::mutate(in_out = any(filetype == 'output') & any(filetype == 'input')) %>%
+    dplyr::filter(!(in_out & filetype == 'input')) %>%
+    dplyr::select(-in_out) %>%
+    dplyr::ungroup()
+
 
   ### setting up arrows_df and edges_df -----
   arrows_df <- data.frame(

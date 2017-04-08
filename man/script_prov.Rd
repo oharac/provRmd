@@ -4,18 +4,19 @@
 \alias{script_prov}
 \title{Assemble script provenance information}
 \usage{
-script_prov(script_file = .prov_parent_script_file, tag = .prov_run_tag,
-  commit_outputs = TRUE)
+script_prov(script_file = .provEnv$parent_script_file,
+  tag = .provEnv$run_tag, commit_outputs = FALSE)
 }
 \arguments{
 \item{script_file}{This should be the name of the parent script, to enable
-a call to \code{git_prov()}.  The default is \code{.prov_parent_script_file}
+a call to \code{git_prov()}.  The default is \code{.provEnv$parent_script_file}
 as set up in \code{prov_setup()}.}
 
 \item{tag}{An optional run tag; defaults to the run tag set in prov_setup().}
 
 \item{commit_outputs}{Should a git commit be created for the output files?
-Defaults to TRUE.}
+Defaults to FALSE; newly created outputs will show as not git-controlled,
+while modified outputs will show as changed since last commit.}
 }
 \value{
 Returns (invisibly) a named list of characters containing system

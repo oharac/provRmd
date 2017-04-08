@@ -2,6 +2,7 @@
 
 export(brick)
 export(gdal_rasterize)
+export(ggsave)
 export(git_prov)
 export(plot_prov)
 export(prov_setup)

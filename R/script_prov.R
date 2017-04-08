@@ -65,7 +65,7 @@ script_prov <- function(script_file = .provEnv$parent_script_file,
   message('memory_use comes from variable run_mem = ', run_mem, ', class = ', class(run_mem))
 
   ### set up base info for .provEnv$script_track -----
-  backwards_predicates <- c('output', 'sourced_script') ### for those annoying prov predicates that flip the subject/object
+  backwards_predicates <- c('output', 'sourced_script', 'plot') ### for those annoying prov predicates that flip the subject/object
   assign('script_track', .provEnv$prov_track %>%
            dplyr::mutate(elapsed_time  = run_time,
                          memory_use    = run_mem,
@@ -104,13 +104,13 @@ script_prov <- function(script_file = .provEnv$parent_script_file,
   ### set up predicates based on filetype -----
   assign('script_track', .provEnv$script_track %>%
            dplyr::mutate(rdf_predicate = 'UNDEFINED', ### initialize value to default
-                         rdf_predicate = ifelse(stringr::str_detect(filetype, 'out'),
+                         rdf_predicate = ifelse(stringr::str_detect(filetype, 'out|plot'),
                                                 'prov:wasGeneratedBy',
                                                 rdf_predicate),
                          rdf_predicate = ifelse(stringr::str_detect(filetype, 'in'),
                                                 'prov:used',
                                                 rdf_predicate),
-                         rdf_predicate = ifelse(stringr::str_detect(filetype, 'source') | stringr::str_detect(filetype, 'chunk'),
+                         rdf_predicate = ifelse(stringr::str_detect(filetype, 'source|chunk'),
                                                 'prov:wasExecutedBy',
                                                 rdf_predicate),
                          rdf_predicate = ifelse(path.expand(rdf_subject) == path.expand(rdf_object),

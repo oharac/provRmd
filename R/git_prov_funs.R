@@ -186,4 +186,14 @@ rasterize <- function(x, y, filename = '', nogit = FALSE, ...) {
   return(z)
 }
 
+#' @rdname git_prov_funs
+#' @export
+ggsave <- function(filename, ..., nogit = FALSE) {
+  z <- ggplot2::ggsave(filename = filename, ...)
+  if(!is.null(knitr:::.knitEnv$input.dir)) {
+    git_prov(filename, filetype = 'plot', nogit)
+  }
+  return(invisible(z))
+}
+
 

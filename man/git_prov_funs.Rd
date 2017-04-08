@@ -3,6 +3,7 @@
 \name{git_prov_funs}
 \alias{brick}
 \alias{gdal_rasterize}
+\alias{ggsave}
 \alias{git_prov_funs}
 \alias{raster}
 \alias{rasterize}
@@ -48,6 +49,8 @@ writeRaster(x, filename, bylayer = FALSE, nogit = FALSE, ...)
 gdal_rasterize(src_datasource, dst_filename, ..., nogit = FALSE)
 
 rasterize(x, y, filename = "", nogit = FALSE, ...)
+
+ggsave(filename, ..., nogit = FALSE)
 }
 \description{
 Utility functions to assist working with git_prov.  Each of these

@@ -1,0 +1,15 @@
+from_loc,to_loc,rel,from,to,label,tooltip,fontsize,fontcolor,fontname,penwidth,arrowsize,color
+~/github/provRmd/rmd_testing/table1.csv,~/github/provRmd/rmd_testing/test.Rmd#read_global_species_list,prov:used,6,2,used,prov:used,6,grey20,Helvetica,1,0.5,#334766
+~/github/provRmd/rmd_testing/test.Rmd#read_global_species_list,~/github/provRmd/rmd_testing/table2.csv,prov:wasGeneratedBy,2,7,wasGeneratedBy,prov:wasGeneratedBy,6,grey20,Helvetica,1,0.5,#3D6633
+~/github/provRmd/rmd_testing/test.Rmd#read_global_species_list,~/github/provRmd/rmd_testing/table3.csv,prov:wasGeneratedBy,2,8,wasGeneratedBy,prov:wasGeneratedBy,6,grey20,Helvetica,1,0.5,#3D6633
+~/github/provRmd/rmd_testing/tableA.csv,~/github/provRmd/rmd_testing/test_source.R,prov:used,9,12,used,prov:used,6,grey20,Helvetica,1,0.5,#334766
+~/github/provRmd/rmd_testing/test_source.R,~/github/provRmd/rmd_testing/tableB.csv,prov:wasGeneratedBy,12,10,wasGeneratedBy,prov:wasGeneratedBy,6,grey20,Helvetica,1,0.5,#3D6633
+~/github/provRmd/rmd_testing/test_source.R,~/github/provRmd/rmd_testing/tableC.csv,prov:wasGeneratedBy,12,11,wasGeneratedBy,prov:wasGeneratedBy,6,grey20,Helvetica,1,0.5,#3D6633
+~/github/provRmd/rmd_testing/table1.csv,~/github/provRmd/rmd_testing/test_source.R,prov:used,6,12,used,prov:used,6,grey20,Helvetica,1,0.5,#334766
+~/github/provRmd/rmd_testing/test.Rmd#sourcing_a_file,~/github/provRmd/rmd_testing/test_source.R,prov:wasExecutedBy,4,12,wasExecutedBy,prov:wasExecutedBy,6,grey20,Helvetica,1,0.5,#665233
+~/github/provRmd/rmd_testing/table3.csv,~/github/provRmd/rmd_testing/test.Rmd#saving_a_plot,prov:used,8,3,used,prov:used,6,grey20,Helvetica,1,0.5,#334766
+~/github/provRmd/rmd_testing/test.Rmd#saving_a_plot,~/github/provRmd/rmd_testing/plot.jpg,prov:wasGeneratedBy,3,13,wasGeneratedBy,prov:wasGeneratedBy,6,grey20,Helvetica,1,0.5,#3D6633
+~/github/provRmd/rmd_testing/test.Rmd,~/github/provRmd/rmd_testing/test.Rmd#read_global_species_list,prov:wasExecutedBy,1,2,wasExecutedBy,prov:wasExecutedBy,6,grey20,Helvetica,1,0.5,#665233
+~/github/provRmd/rmd_testing/test.Rmd,~/github/provRmd/rmd_testing/test.Rmd#sourcing_a_file,prov:wasExecutedBy,1,4,wasExecutedBy,prov:wasExecutedBy,6,grey20,Helvetica,1,0.5,#665233
+~/github/provRmd/rmd_testing/test.Rmd,~/github/provRmd/rmd_testing/test.Rmd#saving_a_plot,prov:wasExecutedBy,1,3,wasExecutedBy,prov:wasExecutedBy,6,grey20,Helvetica,1,0.5,#665233
+~/github/provRmd/rmd_testing/test.Rmd,~/github/provRmd/rmd_testing/test.Rmd#unnamed-chunk-1,prov:wasExecutedBy,1,5,wasExecutedBy,prov:wasExecutedBy,6,grey20,Helvetica,1,0.5,#665233

@@ -4,10 +4,10 @@
 \alias{plot_prov}
 \title{Access git provenance information}
 \usage{
-plot_prov(df = .script_track, plot_dir = c("TB", "LR")[1])
+plot_prov(df = .provEnv$script_track, plot_dir = c("TB", "LR")[1])
 }
 \arguments{
-\item{df}{A dataframe of a provenance log file (i.e. \code{.script_track}
+\item{df}{A dataframe of a provenance log file (i.e. \code{.provEnv$script_track}
 created by call to \code{script_prov()})}
 
 \item{plot_dir}{Should the graph plot top-to-bottom ('TB') or
@@ -23,7 +23,7 @@ most recent commit, adds a line to prov_trackfor this file, and returns
 a dataframe with git provenance information.
 }
 \examples{
-prov_graph <- plot_prov(.script_prov)
+prov_graph <- plot_prov(.provEnv$script_prov)
 DiagrammeR::render_graph(prov_graph)
 }
 
