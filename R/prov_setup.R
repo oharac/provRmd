@@ -64,8 +64,16 @@ prov_setup <- function (run_tag = 'standard run') {
   ### initialize process timing
   assign('start_time', proc.time(), envir = .provEnv)
 
-  ### initialize memory profiling
-  Rprof(filename = file.path(get('log_dir', envir = .provEnv), 'rprof_tmp.out'),
+  ### initialize memory profiling - create log file
+  if(!dir.exists(.provEnv$log_dir)) {
+    message('Creating prov log directory at ', .provEnv$log_dir)
+    dir.create(.provEnv$log_dir)
+  }
+
+  rprof_file <- file.path(.provEnv$log_dir, 'rprof_tmp.out')
+  file.create(rprof_file)
+
+  Rprof(filename = rprof_file,
         # append = FALSE, ### these are defaults
         # interval = 0.02,
         # line.profiling = FALSE,

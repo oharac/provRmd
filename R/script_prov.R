@@ -53,7 +53,7 @@ script_prov <- function(script_file = .provEnv$parent_script_file,
   run_time <- (proc.time() - .provEnv$start_time)[3]
 
   ### gather memory allocations from Rprof log
-  mem_df_tmp <- summaryRprof(filename = file.path(get('log_dir', envir = .provEnv), 'rprof_tmp.out'),
+  mem_df_tmp <- summaryRprof(filename = file.path(.provEnv$log_dir, 'rprof_tmp.out'),
                          memory = 'both') %>%
     .$by.total
 
@@ -61,9 +61,8 @@ script_prov <- function(script_file = .provEnv$parent_script_file,
                        proportional_time = mem_df_tmp$total.pct,
                        total_mem         = mem_df_tmp$mem.total[ , 1]) ### mem.total is a matrix?
 
-  run_mem  <- max(mem_df$total_mem)
-
-  print(plot(total_mem ~ total_time, data = mem_df))
+  run_mem  <- max(mem_df$total_mem, na.rm = TRUE)
+  message('memory_use comes from variable run_mem = ', run_mem, ', class = ', class(run_mem))
 
   ### set up base info for .provEnv$script_track -----
   backwards_predicates <- c('output', 'sourced_script') ### for those annoying prov predicates that flip the subject/object
@@ -154,7 +153,7 @@ script_prov <- function(script_file = .provEnv$parent_script_file,
       run_id_old <- max(log_df$run_id)
       run_id <- run_id_old + 1
       message(sprintf('Log file found at %s; last run_id = %s. Appending latest run.\n', .provEnv$log_file, run_id_old))
-      assign('script_track', data.frame('run_id'   = rep(run_id, length.out = nrow(.provEnv$script_track)),
+      assign('script_track', data.frame('run_id'    = rep(run_id, length.out = nrow(.provEnv$script_track)),
                                          'run_tag'  = tag,
                                          'run_date' = rep(date(), length.out = nrow(.provEnv$script_track)),
                                          .provEnv$script_track,

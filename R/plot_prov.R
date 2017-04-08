@@ -23,13 +23,14 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
 
   df <- df %>%
     dplyr::filter(run_id == max(run_id)) %>%
-    dplyr::mutate(from = rdf_subject,
-                  to   = rdf_object,
-                  rel  = rdf_predicate)
+    dplyr::mutate(from_loc = rdf_subject,
+                  to_loc   = rdf_object,
+                  rel      = rdf_predicate)
   ### NOTE: from subject to object is active; this will ensure that the
   ### sequence goes down the page.  But predicates are usually
   ### passive voice, so e.g. subject WASGENERATEDBY.  So: edges
   ### should have direction set to reverse?
+  message('... in plot_prov.R, setting up shapes_df')
 
   shapes_df <- data.frame(
                  filetype  = c('input',         'output',        'parent_script', 'parent_chunk',   'sourced_script'),
@@ -38,17 +39,30 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
                  fillcolor = c( hsv(.6, .3, .9), hsv(.3, .4, .9), hsv(.1, .4, .9), hsv(.1, .4, .9), hsv(.15, .2, 1)))
     # fontcolor, fontname
 
+
+  message('... in plot_prov.R, setting up nodes_id_df')
+
+  nodes_id_df <- df %>%
+    arrange(sequence, file_loc) %>%
+    select(node_name = file_loc) %>%
+    distinct() %>%
+    mutate(node_id = 1:n())
+
+
+  message('... in plot_prov.R, setting up nodes_df')
   ### setting up nodes df -----
   nodes_df <- df %>%
     dplyr::select(file_loc, parent_chunk, filetype, commit_url, uncommitted_changes) %>%
-    dplyr::mutate(nodes   = file_loc,
-                  label   = basename(file_loc),
-                  tooltip = commit_url,
-                  style   = 'filled',
+    dplyr::mutate(node_name = file_loc,
+                  label     = basename(file_loc),
+                  tooltip   = commit_url,
+                  style     = 'filled',
                   fontsize  = 6,
                   fontcolor = 'grey20',
                   fontname  = 'Helvetica',
                   penwidth  = 2) %>%
+    dplyr::left_join(nodes_id_df %>%
+                       rename(id = node_id), by = 'node_name') %>%
     dplyr::left_join(shapes_df, by = 'filetype') %>%
     # sides, distortion for different shapes!
     # style to differentiate script vs sourced? or alpha to differentiate source ins/outs?
@@ -68,9 +82,14 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
                  rel   = c('prov:used', 'prov:wasGeneratedBy', 'prov:wasExecutedBy'),
                  color = c( hsv(.6, .5, .4),    hsv(.3, .5, .4),       hsv(.1, .5, .4)))
 
+  message('... in plot_prov.R, setting up edges_df')
   edges_df <- df %>%
-    dplyr::select(from, to, rel) %>%
-    dplyr::filter(from != to) %>%
+    dplyr::select(from_loc, to_loc, rel) %>%
+    dplyr::filter(from_loc != to_loc) %>%
+    dplyr::left_join(nodes_id_df %>%
+                       rename(from = node_id), by = c('from_loc' = 'node_name')) %>%
+    dplyr::left_join(nodes_id_df %>%
+                       rename(to = node_id), by = c('to_loc' = 'node_name')) %>%
     dplyr::mutate(label = stringr::str_replace(rel, 'prov:', ''),
                   #dir       = 'back',
                   tooltip   = rel,
@@ -85,17 +104,28 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
     dplyr::distinct()
 
   ### generating graph -----
+  message('... in plot_prov.R, generating graph ', getwd())
+  write_csv(nodes_df, 'nodes.csv')
+  write_csv(edges_df, 'edges.csv')
+
   prov_gr <- DiagrammeR::create_graph(nodes_df = nodes_df,
-                                      edges_df = edges_df,
-                                      graph_attrs  = sprintf('rankdir = %s', plot_dir),
+                                      edges_df = edges_df
+                                      # attr_theme = sprintf('rankdir = %s', plot_dir)
                                       # node_attrs   = NULL,
                                       # edge_attrs   = NULL,
                                       # directed     = TRUE,
                                       # graph_name   = NULL,
                                       # graph_time   = NULL,
                                       # graph_tz     = NULL,
-                                      generate_dot = TRUE)
+                                      # generate_dot = TRUE
+                                      ) %>%
+    DiagrammeR::set_global_graph_attrs(
+      attr      = c("layout", "rankdir"),
+      value     = c("dot",    plot_dir),
+      attr_type = c("graph",  "graph"))
 
+
+  message('... in plot_prov.R, returning plot')
   return(invisible(prov_gr))
 
 }
