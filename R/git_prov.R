@@ -59,7 +59,7 @@ git_prov <- function(filename,
     if(not_tracked) {
 
       message(sprintf('File `%s`: not_tracked == TRUE, skipping git log call', git_file))
-      git_commit_url  <- 'file not tracked in Git'
+      git_commit_url  <- 'no version control info: file not tracked in Git'
       git_uncommitted <- NA
 
     } else if(is.na(git_info[1])) {    ### if git_info[1] is NA, commit info not found.

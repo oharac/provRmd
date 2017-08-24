@@ -71,9 +71,9 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
   ### special cases: no git tracking, or uncommitted changes
   nodes_df <- nodes_df %>%
     dplyr::mutate(color    = ifelse(uncommitted_changes == TRUE, 'yellow', color),
-                  penwidth = ifelse(uncommitted_changes == TRUE, 3,        penwidth),
+                  penwidth = ifelse(uncommitted_changes == TRUE,     3,    penwidth),
                   color    = ifelse(stringr::str_detect(commit_url, 'no version control'), 'red', color),
-                  penwidth = ifelse(stringr::str_detect(commit_url, 'no version control'), 3,     penwidth))
+                  penwidth = ifelse(stringr::str_detect(commit_url, 'no version control'),   3,   penwidth))
 
   ### if a file is both input and output, select only output (for plot attributes)
   nodes_df <- nodes_df %>%
