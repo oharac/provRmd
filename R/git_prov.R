@@ -7,8 +7,15 @@
 #' @param filename A valid file name (relative or absolute) or vector of file names
 #' @param filetype The role of this file within this context: 'input',
 #' 'output', 'parent_script', 'sourced_script', or 'plot'.  Defaults to 'input'.
+#' @param nogit Should this file be skipped for git provenance purposes? Defaults to FALSE.
 #' @param nolog Should this git provenance information be omitted from
 #' the log file? Defaults to FALSE.
+#' @param not_tracked Files used in a script but not tracked in Git can be identified
+#' by a non-response from a \code{git log} command; however, for files known to be not
+#' tracked in this repo (e.g. on a remote server or in a different repository) it may be
+#' desirable to simply skip the \code{git log} and mark it right away as not tracked,
+#' while still including it in the prov log and workflow, etc.
+#' Defaults to FALSE.
 #'
 #' @export
 #' @examples
@@ -23,7 +30,8 @@
 git_prov <- function(filename,
                      filetype = c('input', 'output', 'parent_script', 'sourced_script', 'plot')[1],
                      nogit = FALSE,
-                     nolog = FALSE) {
+                     nolog = FALSE,
+                     not_tracked = FALSE) {
 
   ### Make sure we're operating in a knir environment
   if(is.null(knitr:::.knitEnv$input.dir)) {
@@ -40,13 +48,20 @@ git_prov <- function(filename,
 
     message('Checking git provenance for ', git_file, '...')
     ### attempt to read git_info for script or input
-    suppressWarnings({
-      git_info <- system2('git', args = sprintf('log --follow %s', git_file), stderr = FALSE, stdout = TRUE)[1:3]
-    })
+    if(!not_tracked) {
+      suppressWarnings({
+        git_info <- system2('git', args = sprintf('log --follow %s', git_file), stderr = FALSE, stdout = TRUE)[1:3]
+      })
+    }
+
     ### if git_info[1] is NA, commit info not found.
     if(is.na(git_info[1])) {
       message(sprintf('File `%s`: git commit info unavailable.  Not version-controlled in Git?', git_file))
       git_commit_url  <- 'no version control info found'
+      git_uncommitted <- NA
+    } else if(not_tracked) {
+      message(sprintf('File `%s`: not_tracked == TRUE, skipping git log call', git_file))
+      git_commit_url  <- 'file not tracked in Git'
       git_uncommitted <- NA
     } else {
       ### git_info[1] is not NA, so commit info is available.
