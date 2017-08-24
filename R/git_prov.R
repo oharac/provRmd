@@ -52,16 +52,18 @@ git_prov <- function(filename,
       suppressWarnings({
         git_info <- system2('git', args = sprintf('log --follow %s', git_file), stderr = FALSE, stdout = TRUE)[1:3]
       })
+    } else {
+      git_info <- c(NA, NA, NA)  ### hey hey hey, goodbye
     }
 
     ### if git_info[1] is NA, commit info not found.
-    if(is.na(git_info[1])) {
-      message(sprintf('File `%s`: git commit info unavailable.  Not version-controlled in Git?', git_file))
-      git_commit_url  <- 'no version control info found'
-      git_uncommitted <- NA
-    } else if(not_tracked) {
+    if(not_tracked) {
       message(sprintf('File `%s`: not_tracked == TRUE, skipping git log call', git_file))
       git_commit_url  <- 'file not tracked in Git'
+      git_uncommitted <- NA
+    } else if(is.na(git_info[1])) {
+      message(sprintf('File `%s`: git commit info unavailable.  Not version-controlled in Git?', git_file))
+      git_commit_url  <- 'no version control info found'
       git_uncommitted <- NA
     } else {
       ### git_info[1] is not NA, so commit info is available.

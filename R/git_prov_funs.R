@@ -132,7 +132,8 @@ raster <- function(x, nogit = FALSE, not_tracked = FALSE, ...) {
 brick <- function(x, nogit = FALSE, not_tracked = FALSE, ...) {
   if(is.character(x) & !is.null(knitr:::.knitEnv$input.dir)) {
     y <- raster::brick(x, ...)
-    git_prov(x, filetype = 'input', nogit, not_tracked)
+    ### note that brick takes a list, not a vector: unlist that bad boy
+    git_prov(unlist(x), filetype = 'input', nogit, not_tracked)
     return(y)
   } else {
     return(raster::brick(x, ...))
@@ -144,7 +145,8 @@ brick <- function(x, nogit = FALSE, not_tracked = FALSE, ...) {
 stack <- function(x, nogit = FALSE, not_tracked = FALSE, ...) {
   if(is.character(x[[1]]) & !is.null(knitr:::.knitEnv$input.dir)) {
     y <- raster::stack(x, ...)
-    git_prov(x, filetype = 'input', nogit, not_tracked)
+    ### note that stack takes a list, not a vector: unlist that bad boy so git_prov works!
+    git_prov(unlist(x), filetype = 'input', nogit, not_tracked)
     return(y)
   } else {
     return(raster::stack(x, ...))
