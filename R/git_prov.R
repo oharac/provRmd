@@ -44,11 +44,11 @@ git_prov <- function(filename,
     return(invisible()) ### skip out of git_prov if nogit == TRUE
   }
 
-  for(git_file in filename) {
+  for(git_file in filename) { ### git_file <- filename[1]
 
-    message('Checking git provenance for ', git_file, '...')
     ### attempt to read git_info for script or input
     if(!not_tracked) {
+      message('Checking git provenance for ', git_file, '...')
       suppressWarnings({
         git_info <- system2('git', args = sprintf('log --follow %s', git_file), stderr = FALSE, stdout = TRUE)[1:3]
       })
@@ -56,33 +56,42 @@ git_prov <- function(filename,
       git_info <- c(NA, NA, NA)  ### hey hey hey, goodbye
     }
 
-    ### if git_info[1] is NA, commit info not found.
     if(not_tracked) {
+
       message(sprintf('File `%s`: not_tracked == TRUE, skipping git log call', git_file))
       git_commit_url  <- 'file not tracked in Git'
       git_uncommitted <- NA
-    } else if(is.na(git_info[1])) {
+
+    } else if(is.na(git_info[1])) {    ### if git_info[1] is NA, commit info not found.
+
       message(sprintf('File `%s`: git commit info unavailable.  Not version-controlled in Git?', git_file))
       git_commit_url  <- 'no version control info found'
       git_uncommitted <- NA
+
     } else {
+
       ### git_info[1] is not NA, so commit info is available.
       ### find whether uncommitted differences in this file.
       ### in stringr::str_detect, '$' makes sure git_file string is at end of line.
+
       suppressWarnings({
         git_diff <- system2('git', args = 'diff HEAD', stderr = TRUE, stdout = TRUE)
       })
+
       git_diff_check <- which(stringr::str_detect(git_diff, sprintf('%s$', basename(git_file))) &
                                 stringr::str_detect(git_diff, 'diff --git'))
       git_uncommitted <- length(git_diff_check) > 0
 
       ### convert commit info to a hyperlinked commit info string.
       git_loc  <- system2('git', args = 'config --get remote.origin.url', stderr = TRUE, stdout = TRUE)
+
       if(filetype == 'output')
         git_commit_url <- sprintf('Previous commit: %s/commit/%s', sub('.git', '', git_loc, fixed = TRUE), gsub('commit ', '', git_info[1]))
       else
         git_commit_url <- sprintf('%s/commit/%s', sub('.git', '', git_loc, fixed = TRUE), gsub('commit ', '', git_info[1]))
+
       git_link <- sprintf('commit [%s](%s)', gsub('commit ', '', git_info[1]), git_commit_url)
+
       message(sprintf('File `%s`: most recent commit info: %s; uncommitted changes = %s', git_file,
                       paste(git_info[1], git_info[2], git_info[3], collapse = '; '), git_uncommitted))
     }

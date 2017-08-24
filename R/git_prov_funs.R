@@ -33,7 +33,7 @@ source <- function(source_fn, ..., nogit = FALSE, not_tracked = FALSE) {
     ### reset .provEnv$parent_id back to original value
     assign('parent_id', .provEnv$parent_id_temp, envir = .provEnv)
     if(!is.null(knitr:::.knitEnv$input.dir))
-      git_prov(source_fn, filetype = 'sourced_script', nogit, not_tracked)
+      git_prov(source_fn, filetype = 'sourced_script', nogit = nogit, not_tracked = not_tracked)
   }
   return(invisible(tmp))
 }
@@ -43,7 +43,7 @@ source <- function(source_fn, ..., nogit = FALSE, not_tracked = FALSE) {
 read.csv <- function(file, stringsAsFactors = FALSE, nogit = FALSE, not_tracked = FALSE, ...) {
   x <- utils::read.csv(file, ..., stringsAsFactors = stringsAsFactors)
   if(!is.null(knitr:::.knitEnv$input.dir))
-    git_prov(file, filetype = 'input', nogit, not_tracked)
+    git_prov(file, filetype = 'input', nogit = nogit, not_tracked = not_tracked)
   return(x)
 }
 
@@ -54,7 +54,7 @@ read.csv <- function(file, stringsAsFactors = FALSE, nogit = FALSE, not_tracked 
 write.csv <- function(x, file, row.names = FALSE, nogit = FALSE, not_tracked = FALSE, ...) {
   utils::write.csv(x, file = file, ..., row.names = row.names)
   if(!is.null(knitr:::.knitEnv$input.dir))
-    git_prov(file, filetype = 'output', nogit, not_tracked)
+    git_prov(file, filetype = 'output', nogit = nogit, not_tracked = not_tracked)
   return(invisible(NULL))
 }
 
@@ -64,7 +64,7 @@ write.csv <- function(x, file, row.names = FALSE, nogit = FALSE, not_tracked = F
 read_csv <- function(file, nogit = FALSE, not_tracked = FALSE, ...) {
   x <- readr::read_csv(file, ...)
   if(!is.null(knitr:::.knitEnv$input.dir))
-    git_prov(file, filetype = 'input', nogit, not_tracked)
+    git_prov(file, filetype = 'input', nogit = nogit, not_tracked = not_tracked)
   return(x)
 }
 
@@ -73,7 +73,7 @@ read_csv <- function(file, nogit = FALSE, not_tracked = FALSE, ...) {
 write_csv <- function(x, path, nogit = FALSE, not_tracked = FALSE, ...) {
   readr::write_csv(x, path = path, ...)
   if(!is.null(knitr:::.knitEnv$input.dir))
-    git_prov(path, filetype = 'output', nogit, not_tracked)
+    git_prov(path, filetype = 'output', nogit = nogit, not_tracked = not_tracked)
   return(invisible(x))
 }
 
@@ -83,7 +83,7 @@ write_csv <- function(x, path, nogit = FALSE, not_tracked = FALSE, ...) {
 readOGR <- function(dsn, layer, stringsAsFactors = FALSE, nogit = FALSE, not_tracked = FALSE, ...) {
   x <- rgdal::readOGR(dsn = dsn, layer = layer, ..., stringsAsFactors = stringsAsFactors)
   if(!is.null(knitr:::.knitEnv$input.dir))
-    git_prov(sprintf('%s/%s.shp', dsn, layer), filetype = 'input', nogit, not_tracked)
+    git_prov(sprintf('%s/%s.shp', dsn, layer), filetype = 'input', nogit = nogit, not_tracked = not_tracked)
   return(x)
 }
 
@@ -92,7 +92,7 @@ readOGR <- function(dsn, layer, stringsAsFactors = FALSE, nogit = FALSE, not_tra
 writeOGR <- function(obj, dsn, layer, driver = 'ESRI Shapefile', nogit = FALSE, not_tracked = FALSE, ...) {
   rgdal::writeOGR(obj, dsn = dsn, layer = layer, ..., driver = driver)
   if(!is.null(knitr:::.knitEnv$input.dir))
-    git_prov(sprintf('%s/%s.shp', dsn, layer), filetype = 'output', nogit, not_tracked)
+    git_prov(sprintf('%s/%s.shp', dsn, layer), filetype = 'output', nogit = nogit, not_tracked = not_tracked)
   return(invisible(obj))
 }
 
@@ -101,7 +101,7 @@ writeOGR <- function(obj, dsn, layer, driver = 'ESRI Shapefile', nogit = FALSE, 
 readShapePoly <- function(fn, nogit = FALSE, not_tracked = FALSE, ...) {
   x <- maptools::readShapePoly(fn, ...)
   if(!is.null(knitr:::.knitEnv$input.dir))
-    git_prov(paste(fn, '.shp', sep = ''), filetype = 'input', nogit, not_tracked)
+    git_prov(paste(fn, '.shp', sep = ''), filetype = 'input', nogit = nogit, not_tracked = not_tracked)
   return(x)
 }
 
@@ -110,7 +110,7 @@ readShapePoly <- function(fn, nogit = FALSE, not_tracked = FALSE, ...) {
 writePolyShape <- function(x, fn, nogit = FALSE, not_tracked = FALSE, ...) {
   maptools::writePolyShape(x, fn, ...)
   if(!is.null(knitr:::.knitEnv$input.dir))
-    git_prov(paste(fn, '.shp', sep = ''), filetype = 'output', nogit, not_tracked)
+    git_prov(paste(fn, '.shp', sep = ''), filetype = 'output', nogit = nogit, not_tracked = not_tracked)
   return(invisible(x))
 }
 
@@ -120,7 +120,7 @@ writePolyShape <- function(x, fn, nogit = FALSE, not_tracked = FALSE, ...) {
 raster <- function(x, nogit = FALSE, not_tracked = FALSE, ...) {
   if(is.character(x) & !is.null(knitr:::.knitEnv$input.dir)) {
     y <- raster::raster(x, ...)
-    git_prov(x, filetype = 'input', nogit, not_tracked)
+    git_prov(x, filetype = 'input', nogit = nogit, not_tracked = not_tracked)
     return(y)
   } else {
     return(raster::raster(x, ...))
@@ -133,7 +133,7 @@ brick <- function(x, nogit = FALSE, not_tracked = FALSE, ...) {
   if(is.character(x) & !is.null(knitr:::.knitEnv$input.dir)) {
     y <- raster::brick(x, ...)
     ### note that brick takes a list, not a vector: unlist that bad boy
-    git_prov(unlist(x), filetype = 'input', nogit, not_tracked)
+    git_prov(unlist(x), filetype = 'input', nogit = nogit, not_tracked = not_tracked)
     return(y)
   } else {
     return(raster::brick(x, ...))
@@ -146,7 +146,7 @@ stack <- function(x, nogit = FALSE, not_tracked = FALSE, ...) {
   if(is.character(x[[1]]) & !is.null(knitr:::.knitEnv$input.dir)) {
     y <- raster::stack(x, ...)
     ### note that stack takes a list, not a vector: unlist that bad boy so git_prov works!
-    git_prov(unlist(x), filetype = 'input', nogit, not_tracked)
+    git_prov(unlist(x), filetype = 'input', nogit = nogit, not_tracked = not_tracked)
     return(y)
   } else {
     return(raster::stack(x, ...))
@@ -162,7 +162,7 @@ writeRaster <- function(x, filename, bylayer = FALSE, nogit = FALSE, not_tracked
   }
 
   if(!is.null(knitr:::.knitEnv$input.dir)) {
-      git_prov(filename, filetype = 'output', nogit, not_tracked)
+      git_prov(filename, filetype = 'output', nogit = nogit, not_tracked = not_tracked)
   }
   return(invisible(x))
 }
@@ -172,8 +172,8 @@ writeRaster <- function(x, filename, bylayer = FALSE, nogit = FALSE, not_tracked
 gdal_rasterize <- function(src_datasource, dst_filename, ..., nogit = FALSE, not_tracked = FALSE) {
   gdalUtils::gdal_rasterize(...)
     if(!is.null(knitr:::.knitEnv$input.dir)) {
-      git_prov(src_datasource, filetype = 'input', nogit, not_tracked)
-      git_prov(dst_filename, filetype = 'output', nogit, not_tracked)
+      git_prov(src_datasource, filetype = 'input', nogit = nogit, not_tracked = not_tracked)
+      git_prov(dst_filename, filetype = 'output', nogit = nogit, not_tracked = not_tracked)
     }
   return(invisible(NULL))
 }
@@ -183,7 +183,7 @@ gdal_rasterize <- function(src_datasource, dst_filename, ..., nogit = FALSE, not
 rasterize <- function(x, y, filename = '', nogit = FALSE, not_tracked = FALSE, ...) {
   z <- raster::rasterize(x, y, ..., filename = filename)
   if(filename != '' & !is.null(knitr:::.knitEnv$input.dir)) {
-    git_prov(filename, filetype = 'output', nogit, not_tracked)
+    git_prov(filename, filetype = 'output', nogit = nogit, not_tracked = not_tracked)
   }
   return(z)
 }
@@ -193,7 +193,7 @@ rasterize <- function(x, y, filename = '', nogit = FALSE, not_tracked = FALSE, .
 ggsave <- function(filename, ..., nogit = FALSE, not_tracked = FALSE) {
   z <- ggplot2::ggsave(filename = filename, ...)
   if(!is.null(knitr:::.knitEnv$input.dir)) {
-    git_prov(filename, filetype = 'plot', nogit, not_tracked)
+    git_prov(filename, filetype = 'plot', nogit = nogit, not_tracked = not_tracked)
   }
   return(invisible(z))
 }
