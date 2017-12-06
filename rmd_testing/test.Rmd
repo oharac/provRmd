@@ -45,6 +45,7 @@ write.csv(table1, table3_file)
 ```
 
 ```{r sourcing a file, message = FALSE, echo = TRUE}
+
 source(file.path(dir_test, 'test_source.R'))
 
 ```
@@ -79,8 +80,6 @@ Note that it needs to be included in a code chunk with option `results = 'asis'`
 
 ``` {r, message = FALSE, results = 'asis'}
 
-# nodes <- read_csv('~/github/provRmd/rmd_testing/nodes.csv')
-# edges <- read_csv('~/github/provRmd/rmd_testing/edges.csv')
 prov_wrapup()
 
 ```

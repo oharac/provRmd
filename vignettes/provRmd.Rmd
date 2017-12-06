@@ -55,7 +55,7 @@ knitr::opts_chunk$set(fig.width = 6, fig.height = 6)
 ```
 
 ``` {r setup, echo = TRUE, warning = FALSE, message = FALSE}
-library(dplyr); library(tidyr); library(readr)
+library(tidyverse)
 
 library(provRmd)
 
@@ -66,9 +66,10 @@ prov_setup() ### Initialize provenance tracking
 
 As the knitting process proceeds, each time one of the registered functions is used to read or write data, e.g. `read.csv()` or `writeOGR()`, that function will be performed as normal but then will follow up with an embedded call to `git_prov()`, which uses the file name to query the latest Git commit information.  If no Git information is available (e.g. the file has never been committed, or the file exists outside the current Git repository) then the file will be logged with NAs instead.  
 
-As the script runs, file provenance info is stored in a hidden global object, `.prov_track`, which can be accessed like any R object.  Here we use the built-in `iris` dataset to create a new .csv file that will be used as an input for later chunks. 
+As the script runs, file provenance info is stored in a separate environment (`.provEnv`, the `.` keeps it hidden so it doesn't clutter up your workspace).  Here we use the built-in `iris` dataset to create a new .csv file that will be used as an input for later chunks. The `git_prov()` info will be stored in that hidden environment until it's needed later.
 
 ``` {r git_prov example, echo = TRUE, message = FALSE, warning = FALSE}
+
 iris_df <- iris %>%
   mutate(Petal.Area = Petal.Length * Petal.Width) ### yeah, they're not square petals... whatever!
 
@@ -80,17 +81,8 @@ iris_df <- iris_df %>%
          Skinny.Petal = Aspect.Ratio > mean(Aspect.Ratio))
 
 write_csv(iris_df, 'iris_table2.csv')
+
 ```
-
-### The `.prov_track` variable
-
-`.prov_track` is the hidden global variable that stores provenance info for each tracked file, including:
-
-`r paste(names(.prov_track), sep = ', ')`
-
-Quick peek at the first five variables within `.prov_track` (note, sequence starts at 1 here, but at the _end_ of the knitting session, the master Rmd script will be assigned a sequence of 0):
-
-`r knitr::kable(.prov_track[, 1:5])`
 
 ### Using `git_prov()` manually
 
@@ -103,57 +95,38 @@ Examples of these are given later in the vignette.
 When sourcing external scripts, `git_prov()` will capture provenance for the sourced script, and then associate inputs and outputs to that script, rather than to the parent.
 
 ``` {r git_prov source example, echo = TRUE, message = FALSE, warning = FALSE}
+
+### for knitting locally
+# source('../inst/vignette_data/source_example.R') 
+
+### for knitting from package
 source(system.file('vignette_data/source_example.R', package = 'provRmd'))
+
 ```
-
-Note the new row at the end of `.prov_track()`:
-
-`r knitr::kable(.prov_track[, 1:5])`
 
 ## Wrapping up provenance tracking
 
-At the end of the R Markdown document, the `script_prov()` function collects the sequence of information from all calls to `git_prov()`, attaches system information (from `Sys.info()`) and session information (from `sessionInfo()`), and writes out the log file to the prov directory within the working directory of the parent R Markdown document.  This information is stored in a dataframe object called `.script_track`.  In addition, `script_prov()` returns (invisibly) a named list object containing information about the session and system. 
+At the end of the R Markdown document, the `prov_wrapup()` function collects the sequence of information from all calls to `git_prov()`, attaches system information (from `Sys.info()`) and session information (from `sessionInfo()`), and writes out the log file to the prov directory within the working directory of the parent R Markdown document.  
 
-``` {r script_prov example, echo = TRUE, message = FALSE, warning = FALSE}
-script_out_df <- script_prov() 
-```
-
-### Using the output of `script_prov()`
-
-The named list that is returned from `script_prov()` contains the following information:
-`r paste(names(script_out_df), sep = ', ')`
-
-
-The named list items can be called within the R Markdown document to print system/session info.  For example: 
-
-* `script_out_df$msg_sys` prints: 
-    * `r script_out_df$msg_sys`
-* `script_out_df$msg_att_pkgs` prints: 
-    * `r script_out_df$msg_att_pkgs`
-    
-Just as `.prov_track` can be accessed directly, we can also view the contents of `.script_track`.  The full list of variables:
-`r paste(names(.script_track), sep = ', ')`
-
-A glimpse of `.script_track` (a few select columns):
-`r knitr::kable(.script_track[, 4:9] %>% arrange(sequence) %>% head())`
-
-While `script_prov()` saves the log file for later review, it may also be helpful to include provenance information directly in the knitted output from the R Markdown doc.  Several pre-built footers are included in the package; these footers can be attached as "child" using a simple code chunk.  The footers include the call to `script_prov()` and will include provenance information as text, tables, and/or flow charts at the end of the knitted document.
+In addition, `prov_wrapup()` can also generate a footer for your .Rmd with all the provenance info, as a table, as a summary, and/or as a workflow flow chart (by default, includes all these).  It can also (by default) automatically run a git commit to include any new or changed outputs.  (__NOTE: to display properly,__ the `prov_wrapup()` function must be called from within a code chunk with the `results = 'asis'` chunk option).
 
 ### Creating provenance workflow charts
 
-The `plot_prov()` function uses the `.script_track` dataframe to link inputs, outputs, code chunks, and sourced scripts into a conceptual flow chart.  
+``` {r plot_prov, echo = FALSE, message = FALSE, warning = FALSE}
 
-``` {r plot_prov, echo = TRUE, message = FALSE, warning = FALSE}
+script_prov()
+
 plot_obj <- plot_prov(plot_dir = 'TB')
 
 DiagrammeR::render_graph(plot_obj)
 ```
 
-Red frames indicate files not currently tracked in Git; yellow frames indicate files whose contents have changed since the most recent Git commit.
+The output is a .svg with mouseover tooltips about the latest commit info for each script or file.  Red frames indicate files not currently tracked in Git; yellow frames indicate files whose contents have changed since the most recent Git commit.
 
 # Good practices
 
 ## Naming code chunks
+
 To gain the most granularity in the workflow provenance documentation of your R Markdown process, it is helpful to break up R code into small, meaningful chunks; each chunk might take in some inputs and create some outputs.  Since `provRmd` tracks each chunk separately, it is helpful to give each a short but meaningful name; unnamed chunks will default to `unnamed_chunk_1` and so on.
 
 ## Linking objects passed between code chunks
@@ -163,6 +136,7 @@ While R easily holds objects created in one chunk so they may be used in another
 ### Example of missed link:
 
 Chunk 1 (called `broken_link_example1`)
+
 ``` {r broken_link_example1, echo = TRUE, message = FALSE, warning = FALSE}
 prov_setup() ### to reinitialize provenance tracking
 
@@ -173,6 +147,7 @@ write_csv(y, 'table_y.csv')
 ```
 
 So far so good.  Then comes chunk 2 (called `broken_link_example2`); `y` in current memory is used as an input to create `z`:
+
 ```{r broken_link_example2, echo = TRUE, message = FALSE, warning = FALSE}
 z <- y %>%
   mutate(new_col2 = 'more words')
@@ -193,6 +168,7 @@ From this diagram, there's no easy way to see the relationship between output `t
 ### Example of registered link:
 
 Chunk 1 (called `reg_link_example1`) is identical to the prior example.
+
 ``` {r reg_link_ex1, echo = TRUE, message = FALSE, warning = FALSE}
 prov_setup() ### to clear prior provenance tracking
 
@@ -203,6 +179,7 @@ write_csv(y, 'table_y.csv')
 ```
 
 Chunk 2 (called `reg_link_example2`); `table_y.csv` is used as an input to create `table_z.csv`, but this time object `table_y.csv` is reloaded from disk rather than used from memory.  This seems redundant but can be an advantage, to make sure `table_y.csv` is always the correct object:
+
 ```{r reg_link_ex2, echo = TRUE, message = FALSE, warning = FALSE}
 y <- read_csv('table_y.csv')
 z <- y %>%
@@ -218,7 +195,7 @@ flowchart <- plot_prov(plot_dir = 'TB')
 DiagrammeR::render_graph(flowchart)
 ```
 
-Now we can clearly see that the chunk that output `table_z.csv` used `table_y.csv` as an input.
+Now we can clearly see that the chunk that created the output `table_z.csv` used `table_y.csv` as an input.
 
 The same result can also be accomplished by writing the result object in the first chunk and then simply calling `git_prov('table_y.csv')` (using the file name of the written object), with `filetype = 'input'` (which is the default).  This does not reload the object from disk, but still registers the object as an input to the second chunk.  This can be handy to avoid reloading large files.
 
@@ -258,12 +235,9 @@ DiagrammeR::render_graph(flowchart)
 
 Even though the `table_y.csv` file already exists and is not created anew in this run of the script, both the `iris_table1.csv` (input) and `table_y.csv` (output) still show up in the provenance tracking dataframe, log, and workflow chart.
 
-# Accessing and displaying provenance
+# Using `prov_wrapup()` to create default footers
 
-While the `script_prov()` function collects all the system and session info and attaches it to the provenance log, it only saves the log, and does nothing to display the results.  The information for the provenance log can be accessed from the named list returned from `script_prov()` or the `.script_track` dataframe; but there is a built-in way to access this info easily.
-
-## Using `prov_wrapup()` to create default footers
-The `prov_wrapup()` function includes a call to `script_prov()`, and then provides options to include a brief summary (including just system and session information), a workflow diagram (using `prov_plot()`, a flow chart showing the basic processing steps tracked throughout the script run, as well as the inputs and outputs), and/or a table containing specific information on each tracked file.  Creating a footer based on the example above (__NOTE: to display properly,__ the `prov_wrapup()` function must be called from within a code chunk with the `results = 'asis'` chunk option):
+The `prov_wrapup()` function includes a call to `script_prov()`, and then provides options to include a brief summary (including just system and session information), a workflow diagram (using `prov_plot()`, a flow chart showing the basic processing steps tracked throughout the script run, as well as the inputs and outputs), and/or a table containing specific information on each tracked file.  We'll wrap up this vignette by creating a footer based on the example above:
 
 ``` {r, echo = FALSE, message = FALSE, warning = FALSE}
 prov_setup() ### to clear prior provenance tracking
@@ -294,6 +268,3 @@ prov_wrapup(include_summary  = TRUE,
             header_level = '###')
 ```
 
-## Custom footers
-
-Footers can be customized easily to show different information as desired, as a separate .Rmd or simply within the main Rmd itself.  The basic idea is to call `script_prov()`, and then create desired outputs as a combination of the list object returned from `script_prov()`, the `.script_track` dataframe object, and the `plot_prov()` function (to assemble a workflow diagram).
