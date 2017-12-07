@@ -42,8 +42,7 @@ The `provRmd` package is set up to be very simple to use within an existing R Ma
 * Some regular code chunks that do cool stuff with your awesome data.
     * masked read/write functions will collect Git commit info and file info on your read/written data.
 * At the end of the R Markdown script:
-    * option 1 (basic): `script_prov()` to add a built-in R Markdown provenance footer to attach session and system info, and save a provenance log file.
-    * option 2 (fancy): use `prov_wrapup()` to include an R Markdown footer; this function includes a call to `script_prov()` and then renders provenance information into an optional summary (system and session info), workflow (diagram showing the basic steps of the analysis), and/or table (tabular file-by-file info on provenance)
+    * option 2 (basic): use `prov_wrapup()` to include an R Markdown footer; this function creates a provenance log and then renders provenance information into an optional summary (system and session info), workflow (diagram showing the basic steps of the analysis), and/or table (tabular file-by-file info on provenance)
     * option 3 (hard core): design your own custom footer using standalone calls to `script_prov()` and `plot_prov()`
 
 ## Setting up provenance tracking
@@ -97,7 +96,7 @@ When sourcing external scripts, `git_prov()` will capture provenance for the sou
 ``` {r git_prov source example, echo = TRUE, message = FALSE, warning = FALSE}
 
 ### for knitting locally
-# source('../inst/vignette_data/source_example.R') 
+# source('../inst/vignette_data/source_example.R')
 
 ### for knitting from package
 source(system.file('vignette_data/source_example.R', package = 'provRmd'))
