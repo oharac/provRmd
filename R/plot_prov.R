@@ -126,7 +126,7 @@ plot_prov <- function(df = .provEnv$script_track, plot_dir = c('TB', 'LR')[1]) {
                                       # graph_tz     = NULL,
                                       # generate_dot = TRUE
                                       ) %>%
-    DiagrammeR::set_global_graph_attrs(
+    DiagrammeR::add_global_graph_attrs(
       attr      = c("layout", "rankdir"),
       value     = c("dot",    plot_dir),
       attr_type = c("graph",  "graph"))
