@@ -1,0 +1,2 @@
+memory profiling: sample.interval=20000
+:1091903:1544456:118532792:3106:"stream_delim_" "stream_delim" "write_delim" "readr::write_csv" "write_csv" "eval" "eval" "withVisible" "withCallingHandlers" "handle" "timing_fn" "evaluate_call" "evaluate::evaluate" "evaluate" "in_dir" "block_exec" "call_block" "process_group.block" "process_group" "withCallingHandlers" "process_file" "knitr::knit" "rmarkdown::render" 

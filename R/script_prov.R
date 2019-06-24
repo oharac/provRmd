@@ -53,15 +53,18 @@ script_prov <- function(script_file = .provEnv$parent_script_file,
   run_time <- (proc.time() - .provEnv$start_time)[3]
 
   ### gather memory allocations from Rprof log
-  mem_df_tmp <- summaryRprof(filename = file.path(.provEnv$log_dir, 'rprof_tmp.out'),
-                         memory = 'both') %>%
-    .$by.total
-
-  mem_df <- data.frame(total_time        = mem_df_tmp$total.time,
-                       proportional_time = mem_df_tmp$total.pct,
-                       total_mem         = mem_df_tmp$mem.total[ , 1]) ### mem.total is a matrix?
-
-  run_mem  <- max(mem_df$total_mem, na.rm = TRUE)
+  # message('seeking memory allocations')
+  # mem_df_tmp <- summaryRprof(filename = file.path(.provEnv$log_dir, 'rprof_tmp.out'),
+  #                        memory = 'both') %>%
+  #   .$by.total
+  #
+  # message('summaryRprof successful')
+  # mem_df <- data.frame(total_time        = mem_df_tmp$total.time,
+  #                      proportional_time = mem_df_tmp$total.pct,
+  #                      total_mem         = mem_df_tmp$mem.total[ , 1]) ### mem.total is a matrix?
+  #
+  # run_mem  <- max(mem_df$total_mem, na.rm = TRUE)
+  run_mem <- NA_integer_
   message('memory_use comes from variable run_mem = ', run_mem, ', class = ', class(run_mem))
 
   ### set up base info for .provEnv$script_track -----

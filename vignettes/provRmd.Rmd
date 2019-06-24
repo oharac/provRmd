@@ -49,11 +49,10 @@ The `provRmd` package is set up to be very simple to use within an existing R Ma
 
 The first step in using `provRmd` is to initialize the global variables that will track the process as the Rmd knits.  The `prov_setup()` function performs this, and should be called early in the R Markdown document, before any important files are read or sourced.  If you are using packages with read/write capabilities (e.g. `readr`), it is helpful to load `provRmd` afterward so the automatic provenance tracking masks the basic definition.
 
-``` {r fig setup, echo = FALSE, warning = FALSE, message = FALSE}
-knitr::opts_chunk$set(fig.width = 6, fig.height = 6)
-```
-
 ``` {r setup, echo = TRUE, warning = FALSE, message = FALSE}
+knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.path = 'Figs/',
+                      echo = TRUE, message = FALSE, warning = FALSE)
+
 library(tidyverse)
 
 library(provRmd)
@@ -67,7 +66,7 @@ As the knitting process proceeds, each time one of the registered functions is u
 
 As the script runs, file provenance info is stored in a separate environment (`.provEnv`, the `.` keeps it hidden so it doesn't clutter up your workspace).  Here we use the built-in `iris` dataset to create a new .csv file that will be used as an input for later chunks. The `git_prov()` info will be stored in that hidden environment until it's needed later.
 
-``` {r git_prov example, echo = TRUE, message = FALSE, warning = FALSE}
+``` {r git_prov example}
 
 iris_df <- iris %>%
   mutate(Petal.Area = Petal.Length * Petal.Width) ### yeah, they're not square petals... whatever!
@@ -93,7 +92,7 @@ Examples of these are given later in the vignette.
 
 When sourcing external scripts, `git_prov()` will capture provenance for the sourced script, and then associate inputs and outputs to that script, rather than to the parent.
 
-``` {r git_prov source example, echo = TRUE, message = FALSE, warning = FALSE}
+``` {r git_prov source example}
 
 ### for knitting locally
 # source('../inst/vignette_data/source_example.R')
@@ -136,7 +135,7 @@ While R easily holds objects created in one chunk so they may be used in another
 
 Chunk 1 (called `broken_link_example1`)
 
-``` {r broken_link_example1, echo = TRUE, message = FALSE, warning = FALSE}
+``` {r broken_link_example1}
 prov_setup() ### to reinitialize provenance tracking
 
 x <- read_csv('iris_table1.csv')
@@ -147,7 +146,7 @@ write_csv(y, 'table_y.csv')
 
 So far so good.  Then comes chunk 2 (called `broken_link_example2`); `y` in current memory is used as an input to create `z`:
 
-```{r broken_link_example2, echo = TRUE, message = FALSE, warning = FALSE}
+```{r broken_link_example2}
 z <- y %>%
   mutate(new_col2 = 'more words')
 write_csv(z, 'table_z.csv')
@@ -168,7 +167,7 @@ From this diagram, there's no easy way to see the relationship between output `t
 
 Chunk 1 (called `reg_link_example1`) is identical to the prior example.
 
-``` {r reg_link_ex1, echo = TRUE, message = FALSE, warning = FALSE}
+``` {r reg_link_ex1}
 prov_setup() ### to clear prior provenance tracking
 
 x <- read_csv('iris_table1.csv')
@@ -179,7 +178,7 @@ write_csv(y, 'table_y.csv')
 
 Chunk 2 (called `reg_link_example2`); `table_y.csv` is used as an input to create `table_z.csv`, but this time object `table_y.csv` is reloaded from disk rather than used from memory.  This seems redundant but can be an advantage, to make sure `table_y.csv` is always the correct object:
 
-```{r reg_link_ex2, echo = TRUE, message = FALSE, warning = FALSE}
+```{r reg_link_ex2}
 y <- read_csv('table_y.csv')
 z <- y %>%
   mutate(new_col2 = 'more words')
@@ -202,7 +201,7 @@ The same result can also be accomplished by writing the result object in the fir
 
 Sometimes you'd like to avoid re-running a time-consuming process each time the master Rmd is knitted, for example by including an `if(file.exists(filename))` to see if a large raster file already exists before recreating it.  In such a situation where that file already exists, it may be helpful to include a `git_prov()` call (with `filetype = 'output'`) to register that it would normally be created within that code chunk, even if it was not recreated during that particular run.
 
-``` {r if_link1, echo = TRUE, message = FALSE, warning = FALSE}
+``` {r if_link1}
 prov_setup() ### to clear prior provenance tracking
 
 if(!file.exists('table_y.csv')) {
@@ -217,7 +216,7 @@ if(!file.exists('table_y.csv')) {
 }
 ```
 
-```{r if_link2, echo = TRUE, message = FALSE, warning = FALSE}
+```{r if_link2}
 y <- read_csv('table_y.csv')
 z <- y %>%
   mutate(new_col2 = 'more words')
@@ -258,9 +257,10 @@ y <- read_csv('table_y.csv')
 z <- y %>%
   mutate(new_col2 = 'more words')
 write_csv(z, 'table_z.csv')
+
 ```
 
-``` {r, echo = TRUE, message = FALSE, warning = FALSE, results = 'asis'}
+``` {r, results = 'asis'}
 prov_wrapup(include_summary  = TRUE, 
             include_workflow = TRUE, 
             include_table    = TRUE,
