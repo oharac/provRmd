@@ -1,15 +1,13 @@
 ---
-title: "provRmd"
+title: "Provenance tracking in RMarkdown using `provRmd`"
+author: "Casey O'Hara"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{provRmd}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
-<!-- title: "Provenance tracking in RMarkdown using provRmd" -->
-<!-- author: "Casey O'Hara" -->
-<!-- date: "`r Sys.Date()`" -->
 
 # Intro to provenance
 
@@ -260,9 +258,6 @@ z <- y %>%
   mutate(new_col2 = 'more words')
 write_csv(z, 'table_z.csv')
 
-### clean out the created files
-unlink(list.files('.', pattern = '^table_|^iris_table'))
-unlink('prov', recursive = TRUE)
 ```
 
 ``` {r, results = 'asis'}
@@ -270,5 +265,11 @@ prov_wrapup(include_summary  = TRUE,
             include_workflow = TRUE, 
             include_table    = TRUE,
             header_level = '###')
+```
+
+```{r}
+### clean out the created files
+unlink(list.files('.', pattern = '^table_|^iris_table'))
+unlink('prov', recursive = TRUE)
 ```
 
