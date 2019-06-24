@@ -1,2 +1,0 @@
-memory profiling: sample.interval=20000
-:978731:1463128:96824392:2564:"eval" "match.arg" "setHook" "set_hooks" "evaluate_call" "evaluate::evaluate" "evaluate" "in_dir" "block_exec" "call_block" "process_group.block" "process_group" "withCallingHandlers" "process_file" "knitr::knit" "rmarkdown::render" 

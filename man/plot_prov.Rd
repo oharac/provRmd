@@ -26,4 +26,3 @@ a dataframe with git provenance information.
 prov_graph <- plot_prov(.provEnv$script_prov)
 DiagrammeR::render_graph(prov_graph)
 }
-

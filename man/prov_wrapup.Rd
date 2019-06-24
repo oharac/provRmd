@@ -5,28 +5,30 @@
 \title{Wrap up provenance tracking}
 \usage{
 prov_wrapup(include_summary = TRUE, include_workflow = TRUE,
-  include_table = TRUE, plot_dir = "TD", commit_outputs = TRUE,
-  include_header = TRUE, header_level = "#")
+  include_table = TRUE, plot_dir = "TD", commit_outputs = FALSE,
+  include_header = FALSE, header_level = "#")
 }
 \arguments{
-\item{include_summary}{Should a summary of session and system info be included in the rendered Rmd?}
+\item{include_summary}{Should a summary of session and system info
+be included in the rendered Rmd? (default TRUE)}
 
-\item{include_workflow}{Should a flow chart of the workflow be included in the rendered Rmd?}
+\item{include_workflow}{Should a flow chart of the workflow be
+included in the rendered Rmd? (default TRUE)}
 
-\item{include_table}{Should an output table be included in the rendered Rmd?}
+\item{include_table}{Should an output table be included in the
+rendered Rmd? (default TRUE)}
 
-\item{plot_dir}{Direction of workflow plot: \code{'TD'} (default) creates a top-down plot
-while \code{'LR'} creates a left-right plot.}
+\item{plot_dir}{Direction of workflow plot: \code{'TD'} (default)
+creates a top-down plot while \code{'LR'} creates a left-right plot.}
 
-\item{commit_outputs}{Argument passed to script_prov(); create a commit for any new files created during this run? (default TRUE)}
+\item{commit_outputs}{Argument passed to script_prov(); create a
+commit for any new files created during this run? (default FALSE)}
 
 \item{include_header}{Should a "Provenance" header be included?}
 
-\item{header_level}{At what Markdown header style should the "Provenance" header be
-assigned? e.g. '#' = header 1, '##' header 2, etc. Default: '#' (header 1 style)}
-
-\item{commit_outputs}{Argument passed to script_prov(); create a commit for
-any new files created during this run? (default TRUE)}
+\item{header_level}{At what Markdown header style should the
+"Provenance" header be assigned? e.g. '#' = header 1, '##' header 2,
+etc. Default: '#' (header 1 style)}
 }
 \description{
 This function complets the provenance tracking by capturing the provenance
@@ -39,4 +41,3 @@ called inside a code chunk with chunk option: \code{results = 'asis'}
 \examples{
 prov_wrapup()
 }
-

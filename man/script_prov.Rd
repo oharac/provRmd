@@ -31,4 +31,3 @@ the script and adds system and session info, as well as RDF predicate info.
 \examples{
 script_prov()
 }
-

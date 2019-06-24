@@ -21,4 +21,3 @@ push the files, only commits them.
 \examples{
 commit_prov()
 }
-

@@ -5,7 +5,8 @@
 \title{Access git provenance information}
 \usage{
 git_prov(filename, filetype = c("input", "output", "parent_script",
-  "sourced_script", "plot")[1], nogit = FALSE, nolog = FALSE)
+  "sourced_script", "plot")[1], nogit = FALSE, nolog = FALSE,
+  not_tracked = FALSE)
 }
 \arguments{
 \item{filename}{A valid file name (relative or absolute) or vector of file names}
@@ -13,8 +14,17 @@ git_prov(filename, filetype = c("input", "output", "parent_script",
 \item{filetype}{The role of this file within this context: 'input',
 'output', 'parent_script', 'sourced_script', or 'plot'.  Defaults to 'input'.}
 
+\item{nogit}{Should this file be skipped for git provenance purposes? Defaults to FALSE.}
+
 \item{nolog}{Should this git provenance information be omitted from
 the log file? Defaults to FALSE.}
+
+\item{not_tracked}{Files used in a script but not tracked in Git can be identified
+by a non-response from a \code{git log} command; however, for files known to be not
+tracked in this repo (e.g. on a remote server or in a different repository) it may be
+desirable to simply skip the \code{git log} and mark it right away as not tracked,
+while still including it in the prov log and workflow, etc.
+Defaults to FALSE.}
 }
 \description{
 This function takes a filename and reads its git log, strips to its
@@ -31,4 +41,3 @@ git_prov('raw_data.csv', filetype = 'input', nolog = TRUE)
   ### git tracking data frame.  This can be useful if you just want to
   ### peek at the commit info.
 }
-
